@@ -1,0 +1,54 @@
+/************** custom message notification *******************/
+.success-well {
+	padding: 10px;
+	border-left:5px solid green;
+	background-color: #F2F3F4;
+}
+
+.danger-well {
+	padding: 10px;
+	border-left:5px solid red;
+	background-color: #F2F3F4;
+}
+
+.warning-well {
+    padding: 10px;
+	border-left: 5px solid #F1C40F;
+	background-color: #F2F3F4;
+}
+
+.info-well {
+	padding: 10px;
+	border-left:5px solid rgb(0, 195, 255);
+	background-color: #F2F3F4;
+}
+
+
+/**************************** Utilities *******************************/
+.create-hover:hover {
+    cursor: pointer;
+}
+
+.title-hold {
+    border-bottom: 4px solid #D6DBDF;
+    padding:30px;
+}
+
+.content-hold {
+    padding: 30px;
+    border-bottom: 4px solid #D6DBDF;
+}
+
+.election-hold {
+    padding:20px;
+    border-bottom: 4px solid #D6DBDF;
+}
+
+.required {
+    color: red;
+}
+
+.form-input {
+    height: 40px;
+    font-size:18px;
+}

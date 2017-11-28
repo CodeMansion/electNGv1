@@ -1,0 +1,27 @@
+h2 {
+    margin-right: 10px;
+}
+
+.com {
+    color: red;
+}
+
+.info {
+    font-size: 10px;
+    font-style: italic;
+}
+
+#avatar {
+    height: 120px;
+    width: 120px;
+    background-image: url("/img/avatars/avatar13.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.table thead th {
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
