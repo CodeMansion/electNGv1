@@ -1,0 +1,65 @@
+html,
+body {
+    margin:0;
+    padding:0;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 100%;
+}
+
+#logo-hold {
+    padding:10px;
+    margin-bottom:15px;
+}
+
+#logo-hold img {
+    width: 100px;
+    height:100px;
+}
+
+.input-box {
+    border-radius: 0;
+    height:40px;
+}
+
+.row p > a {
+    color:rgb(95, 95, 95);
+}
+
+.row .block-content {
+    padding: 30px;
+    margin-bottom:10px;
+}
+
+
+/************** custom message notification *******************/
+.success-well-login {
+	padding: 10px;
+	border-left:4px solid green;
+	background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.danger-well-login {
+	padding: 10px;
+	border-left:4px solid red;
+	background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.warning-well-login {
+    padding: 10px;
+	border-left: 4px solid #F1C40F;
+	background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.info-well-login {
+	padding: 10px;
+	border-left:4px solid rgb(0, 195, 255);
+    background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
