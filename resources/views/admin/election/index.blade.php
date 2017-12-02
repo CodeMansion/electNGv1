@@ -3,6 +3,8 @@
     <!--customize styling for student resource-->
     <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
     <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('js/plugins/select2/select2.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('js/plugins/select2/select2-bootstrap.min.css')}}">
 @endsection
 @section('content')
     <main id="main-container">
@@ -15,8 +17,10 @@
                             <h3 style="margin-bottom:5px;">
                                 <i class="si si-feed"></i> Elections 
                                 <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button">Add Election</button>
+                                <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
                             </h3><hr/>
                             <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
+                            @include('partials.notifications')
                         </div>
                     </div>
                 </div>
@@ -58,41 +62,42 @@
         </div>
     </main>
 @endsection
-@section('modals')
-    @include('admin.election.modals._new_election')
-@endsection
 @section('extra_script')
     <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
     <script src="{{ asset('js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
-
+    <script src="{{ asset('js/plugins/select2/select2.full.min.js')}}"></script>
     <script src="{{ asset('js/pages/be_forms_plugins.js') }}"></script>
+
     <script type="text/javascript">
         $(document).ready(function() {
-            //submit new user form
-            $('#submit').on("click",function() {
-                $.LoadingOverlay("show");
-                $.ajax({
-                    url: "{{URL::route('Election.New')}}",
-                    method: "POST",
-                    data:{
-                        '_token': "{{csrf_token()}}",
-                        'name' : $('input[name=name]').val(),
-                        'description' : $('textarea[name=description]').val(),
-                        'start_date' : $('input[name=start_date]').val(),
-                        'end_date' : $('input[name=end_date]').val(),
-                        'req' : "newElection"
-                    },
-                    success: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Created!", rst, "success");
-                        location.reload();
-                    },
-                    error: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Oops! Error","An Error Occured!", "error");
-                    }
-                });
-            });   
+            $("#view-lga").hide();
+            $("#view-parties").hide();
+
+            $("select[name=type]").on("change", function(){
+                if($("select[name=type]").val() == 'lga') {
+                    $.LoadingOverlay("show");
+                    $.ajax({
+                        url: "{{URL::route('ElectionAjax')}}",
+                        method: "POST",
+                        data:{
+                            '_token': "{{csrf_token()}}",
+                            'req': "viewLga"
+                        },
+                        success: function(data){
+                            $("#view-lga").show();
+                            $.LoadingOverlay("hide");
+                            $("#view-lga").html(data);
+                            $("#view-parties").show();
+                        },
+                        error: function(rst){
+                            $.LoadingOverlay("hide");
+                            swal("Oops! Error","An Error Occured!", "error");
+                        }
+                    });
+                } else {
+                    $("#view-state").hide();
+                }
+            });
         });    
     </script>
     <script>
@@ -101,4 +106,7 @@
             Codebase.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider', 'tags-inputs']);
         });
     </script>
+@endsection
+@section('modals')
+    @include('admin.election.modals._new_election')
 @endsection

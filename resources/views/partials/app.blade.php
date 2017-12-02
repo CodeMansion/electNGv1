@@ -5,10 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
         <meta name="author" content="">
         <meta name="description" content="" />
-        
         <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/png" />
 
         <title>ElectNG&trade; | Dashboard </title>
+        
         <link href="{{ asset('css/codebase.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
         <link href="{{ asset('js/plugins/sweetalert/sweetalert.css') }}" rel="stylesheet">
@@ -43,9 +43,9 @@
         <script src="{{ asset('js/jquery.countTo.min.js') }}"></script>
         <script src="{{ asset('js/js.cookie.min.js') }}"></script>
         <script src="{{ asset('js/codebase.js') }}"></script>
-        <script src="{{ asset('js/plugins/sweetalert/sweetalert.min.js') }}"></script>
 
         <script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
+        <script src="{{ asset('js/plugins/sweetalert/sweetalert.min.js') }}"></script>
 
         <!---notification messages---->
         <script src="{{ asset('js/notify.min.js') }}"></script>

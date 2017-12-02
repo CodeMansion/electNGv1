@@ -14,12 +14,17 @@ class DatabaseConfigProvider extends ServiceProvider
      */
     public function boot()
     {
-        $active = \DB::table("pivot_active_state")->first();
-        $state = State::find($active->state_id);
-        config()->set([
-            'constants.ACTIVE_STATE_NAME' => $state['name'],
-            'constants.ACTIVE_STATE_ID' => $active->state_id
-        ]);
+        if(\Schema::hasTable("pivot_active_state"))
+        {
+            $active = \DB::table("pivot_active_state")->first();
+            if(isset($active)){
+                $state = State::find($active->state_id);
+                config()->set([
+                    'constants.ACTIVE_STATE_NAME' => $state['name'],
+                    'constants.ACTIVE_STATE_ID' => $active->state_id
+                ]);
+            }
+        } 
     }
 
     /**

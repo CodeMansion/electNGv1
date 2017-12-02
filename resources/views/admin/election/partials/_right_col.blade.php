@@ -2,7 +2,7 @@
     <div class="block-header block-header-default">
         <h3 class="block-title">
             Registered Political Party
-            <button class="btn btn-sm btn-secondary create-hover pull-right" id="viewAsnForm" data-toggle="tooltip" title="Assign parties to election." type="button"><i class="fa fa-plus"></i> </button>
+            <button class="btn btn-sm btn-secondary btn-rounded btn-noborder create-hover pull-right" id="viewAsnForm" data-toggle="tooltip" title="Assign parties to election." type="button"><i class="fa fa-plus"></i> Add</button>
         </h3>
     </div>
     <div class="block-content" data-toggle="slimscroll">
