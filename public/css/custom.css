@@ -2,25 +2,25 @@
 .success-well {
 	padding: 10px;
 	border-left:5px solid green;
-	background-color: #F2F3F4;
+	background-color: rgb(213, 250, 203);
 }
 
 .danger-well {
 	padding: 10px;
 	border-left:5px solid red;
-	background-color: #F2F3F4;
+	background-color: rgb(245, 197, 197);
 }
 
 .warning-well {
     padding: 10px;
 	border-left: 5px solid #F1C40F;
-	background-color: #F2F3F4;
+	background-color: rgb(245, 236, 199);
 }
 
 .info-well {
 	padding: 10px;
 	border-left:5px solid rgb(0, 195, 255);
-	background-color: #F2F3F4;
+	background-color: rgb(195, 225, 255);
 }
 
 

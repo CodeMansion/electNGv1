@@ -29,6 +29,7 @@
                     <a class="dropdown-item" href="#"><span><i class="si si-note mr-5"></i> Polling Results</span></a>
                     <a class="dropdown-item" href="#"><i class="si si-users mr-5"></i> User Types</a>
                     <a class="dropdown-item" href="#"><i class="si si-lock mr-5"></i> Roles & Permissions</a>
+                    <a class="dropdown-item" href="{{URL::route('preference.uploadView')}}"><i class="si si-lock mr-5"></i> Bulk Upload</a>
                     <a class="dropdown-item" href="#"><i class="si si-settings mr-5"></i> Preferences</a>
                 </div>
             </div>

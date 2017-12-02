@@ -20,6 +20,7 @@
                     <a href="{{URL::route('Dashboard')}}"><i class="si si-settings"></i> Preferences</a> | 
                 </p>
             </div>
+            @include('partials.notifications')
         </div>
     </div>
 

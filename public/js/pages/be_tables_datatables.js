@@ -15,8 +15,8 @@ var BeTableDatatables = function() {
     // Init full DataTable, for more examples you can check out https://www.datatables.net/
     var initDataTableFull = function() {
         jQuery('.js-dataTable-full').dataTable({
-            columnDefs: [ { orderable: false, targets: [ 4 ] } ],
-            pageLength: 20,
+            columnDefs: [ { orderable: true, targets: [ 4 ] } ],
+            pageLength: 50,
             lengthMenu: [[5, 8, 15, 20], [5, 8, 15, 20]],
             autoWidth: true
         });
@@ -27,7 +27,7 @@ var BeTableDatatables = function() {
         jQuery('.js-dataTable-full-pagination').dataTable({
             pagingType: "full_numbers",
             columnDefs: [ { orderable: false, targets: [ 4 ] } ],
-            pageLength: 20,
+            pageLength: 50,
             lengthMenu: [[5, 8, 15, 20], [5, 8, 15, 20]],
             autoWidth: true
         });
