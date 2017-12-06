@@ -46,7 +46,7 @@
         <script src="{{ asset('js/plugins/sweetalert/sweetalert.min.js') }}"></script>
 
         <script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
-
+        
         <!---notification messages---->
         <script src="{{ asset('js/notify.min.js') }}"></script>
         @if(\Session::has('error'))

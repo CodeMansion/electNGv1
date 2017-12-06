@@ -12,4 +12,12 @@ class Ward extends Model
         }
         return self::where('id', '=', $id)->firstOrFail();
     }
+
+    public function state(){
+    	return $this->belongsTo(\App\State::class);
+    }
+
+    public function lga(){
+    	return $this->belongsTo(\App\Lga::class);
+    }
 }

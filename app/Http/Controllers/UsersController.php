@@ -18,6 +18,7 @@ class UsersController extends Controller
      */
     public function index()
     {
+        //this is geeting everything abut the user and passing it to the view
         $data['userTypes'] = UserType::all();
         $data['users'] = User::all();
         $data['roles'] = Role::all();
@@ -125,9 +126,52 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        //Updating the user details
+        $data = $request->all();
+        if($data['req'] == 'UpdateUser'){
+
+            \DB::beginTransaction();
+            try {
+                //saving new user and login datails
+                $user = User::findorfail($data['id']);
+                $user->user_type_id = $data['user_type_id'];
+                $user->username = $data['username'];
+                $user->email = $data['email'];
+                $user->save();
+
+                //storing user profile
+                $profile = UserProfile::whereUserId($data['id'])->first();
+                $profile->first_name = $data['first_name'];
+                $profile->last_name = $data['last_name'];
+                $profile->phone = $data['phone'];
+                $profile->res_address = $data['res_address'];
+                $profile->save();
+
+                //assigning role to new user
+                if(isset($data['role_id'])){
+                    $check = \DB::table('role_user')->where(['role_id'=>$data['role_id']])->first();
+                    if(!isset($check)){
+                       $update = User::find($user->id)
+                        ->roles()->save(
+                            Role::whereId($data['role_id'])->firstOrFail()
+                        ); 
+                    }
+                    
+                } else {
+                    //assigning default role to user
+                    $user->assignRole(2);
+                }
+
+                \DB::commit();
+                return redirect()->back()->with("success","User Updated successfully.");
+
+            } catch(Exception $e) {
+                \DB::rollback();
+                return redirect()->back()->with("error","Failed to update user.");
+            }
+        }
     }
 
     /**
@@ -136,8 +180,23 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        //deleting the user and other table where is id is relevant.
+        $id = $request->id;
+        \DB::beginTransaction();
+        try 
+        {
+            $user = User::whereId($id)->first();
+            $user->delete();
+            $profile = UserProfile::whereUserId($id)->first()->delete();
+            \DB::table('role_user')->where('user_id',$id)->delete();
+            \DB::commit();
+            return redirect()->back()->with("success","User Updated successfully.");
+
+        } catch(Exception $e) {
+            \DB::rollback();
+            return redirect()->back()->with("error","Failed to delete user.");
+        }
     }
 }

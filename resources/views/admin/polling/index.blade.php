@@ -9,8 +9,8 @@
                     <div class="block block-content title-hold">
                         <div class="col-md-12">
                             <h3 style="margin-bottom:5px;">
-                                <i class="si si-users"></i> Users 
-                                <button data-toggle="modal" data-target="#new-user" class="btn btn-sm btn-primary create-hover" type="button">Add New</button>
+                                <i class="si si-users"></i> pollings 
+                                <button data-toggle="modal" data-target="#new-polling" class="btn btn-sm btn-primary create-hover" type="button">Add New</button>
                             </h3><hr/>
                             <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
                         </div>
@@ -21,9 +21,9 @@
             <div class="row">
                 <div class="col-12 col-xl-12">
                     <div class="block block-content content-hold">
-                        @if(count($users) < 1)
+                        @if(count($pollings) < 1)
                             <div class="danger-well">
-                                <em>There are no users on this system. User to button above to create a new user.</em>
+                                <em>There are no polling on this system. User to button above to create a new polling.</em>
                             </div>
                         @else
                             <table class="table table-condensed table-hover table-striped">
@@ -31,24 +31,24 @@
                                     <tr>
                                         <th width="50"><input type="checkbox" name="" value=""></th>
                                         <th width="50"></th>
-                                        <th>Username</th>
                                         <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
+                                        <th>State</th>
+                                        <th>Lga</th>
+                                        <th>Ward</th>
                                     </td>
                                 </thead>
                                 <tbody>
-                                    @foreach($users as $user)
+                                    @foreach($pollings as $polling)
                                         <tr>
                                             <td><input type="checkbox" name="" value=""></td>
                                             <td><img src="{{ asset('images/default.png') }}" width="26" height="26" /></td>
                                             <td class="user-edit">
-                                                <a href="">{{$user['username']}}</a><br/>
-                                                <span id="user-view" style="display:none;color:grey;" style="font-size: 12px;"><a href="#" data-toggle="modal" data-target="#edit-user{{$user['id']}}" ><i class="fa fa-edit"></i> Edit</a> | <a href="#" class="danger" id="delete" data-id="{{$user->id}}"><i class="fa fa-times"></i> delete</a></span>
+                                                <a href="">{{$polling['name']}}</a><br/>
+                                                <span id="polling-view" style="display:none;color:grey;" style="font-size: 12px;"><a href="#" data-toggle="modal" data-target="#edit-user{{$polling['id']}}" ><i class="fa fa-edit"></i> Edit</a> | <a href="#" class="danger" id="delete" data-id="{{$polling->id}}"><i class="fa fa-times"></i> delete</a></span>
                                             </td>
-                                            <td>{{$user->profile->first_name.' '.$user->profile->last_name}}</td>
-                                            <td>{{$user['email']}}</td>
-                                            <td>{{$user->roles()->pluck('name')->implode('|')}}</td>
+                                            <td>{{$polling->state->name}}</td>
+                                            <td>{{$polling->lga->name}}</td>
+                                            <td>{{$polling->ward->name}}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -65,31 +65,63 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('table.table-condensed tbody tr').on('mouseover',function() {
-            $('#user-view').show();
+            $('#polling-view').show();
         });
         $('table.table-condensed tbody tr').on('mouseout',function() {
-            $('#user-view').hide();
+            $('#polling-view').hide();
         });
-        $('#submit').on("click",function() {
+        $('#state').on("change",function(){
+              var value=$(this).val();      
+                  $.ajax({
+                    type: 'get',
+                    url: "{{URL::route('ward.lga')}}",
+                    data: {'state_id':value},
+                    success:function(data){
+                        console.log(data);
+                        $('#local').html('');
+                        $('#local').append(data);
+                        /*$.each(data,function(index,sublocalObj){
+                            $('#local').append('<option value="'+sublocalObj.id+'">'+sublocalObj.name+'</option>');
+                        });*/
+                    }
+                });
+              
+            });
+            $('#local').on("change",function(){
+                var state =$('#state').val();
+              var value=$(this).val();      
+                  $.ajax({
+                    type: 'get',
+                    url: "{{URL::route('polling.ward')}}",
+                    data: {'state_id':state,'local_id':value},
+                    success:function(data){
+                        console.log(data);
+                        $('#ward').html('');
+                        $('#ward').append(data);
+                        /*$.each(data,function(index,sublocalObj){
+                            $('#local').append('<option value="'+sublocalObj.id+'">'+sublocalObj.name+'</option>');
+                        });*/
+                    }
+                });
+              
+            });
+            $('#submit').on("click",function() {
                 $.LoadingOverlay("show");
                 $.ajax({
-                    url: "{{URL::route('Users.New')}}",
+                    url: "{{URL::route('polling.store')}}",
                     method: "POST",
                     data:{
                         '_token': "{{csrf_token()}}",
-                        'email' : $('input[name=email]').val(),
-                        'username' : $('input[name=username]').val(),
-                        'user_type_id' : $('select[name=user_type_id]').val(),
-                        'role_id' : $('select[name=role_id]').val(),
-                        'first_name' : $('input[name=first_name]').val(),
-                        'last_name' : $('input[name=last_name]').val(),
-                        'phone' : $('input[name=phone]').val(),
-                        'res_address': $('textarea[name=res_address]').val(),
-                        'req' : "newUser"
+                        'name' : $('input[name=name]').val(),
+                        'state' : $('select[name=state]').val(),
+                        'lga' : $('select[name=local]').val(),
+                        'ward': $('select[name=ward]').val(),
+                        'req' : "newpolling"
                     },
-                    success: function(rst){
+                    success: function(rst,type,title){
                         $.LoadingOverlay("hide");
-                        swal("User Created Successfully", "Mail sent successfully in minutes.", "success");
+                        //swal(title, rst, type);
+                        swal("polling Created Successfully", "Mail sent successfully in minutes.", "success");
                         location.reload();
                     },
                     error: function(rst){
@@ -97,30 +129,26 @@
                         swal("Oops! Error","An Error Occured!", "error");
                     }
                 });
-            }); 
+            });
         $("#modal .modal").each(function(i) {
-            $('#updateUser'+i).on("click",function() {
+            $('#updatepolling'+i).on("click",function() {
                 var id=$('#id'+i).val();
                 $.LoadingOverlay("show");
                 $.ajax({
-                    url: "{{URL::route('Users.update')}}",
+                    url: "{{URL::route('polling.update')}}",
                     method: "POST",
                     data:{
                         '_token': "{{csrf_token()}}",
                         'id':id,
-                        'email' : $('#email'+i).val(),
-                        'username' : $('#username'+i).val(),
-                        'user_type_id' : $('#user_type_id'+i).val(),
-                        'role_id' : $('#role_id'+i).val(),
-                        'first_name' : $('#first_name'+i).val(),
-                        'last_name' : $('#last_name'+i).val(),
-                        'phone' : $('#phone'+i).val(),
-                        'res_address': $('#res_address'+i).val(),
-                        'req' : "UpdateUser"
+                        'name' : $('#name'+i).val(),
+                        'state' : $('#state'+i).val(),
+                        'lga' : $('#local'+i).val(),
+                        'ward' : $('#ward'+i).val(),
+                        'req' : "Updatepolling"
                     },
                     success: function(rst){
                         $.LoadingOverlay("hide");
-                        swal("User Updated Successfully", "Mail sent successfully in minutes.", "success");
+                        swal("polling Updated Successfully", "Mail sent successfully in minutes.", "success");
                         location.reload();
 
                     },
@@ -132,9 +160,9 @@
             });   
         });
         $('#delete').on("click",function(){
-            alert($(this).data('id'));
+            //alert($(this).data('id'));
             $.ajax({
-                    url: "{{URL::route('Delete.User')}}",
+                    url: "{{URL::route('Delete.polling')}}",
                     method: "DELETE",
                     data:{
                         '_token': "{{csrf_token()}}",
@@ -142,7 +170,7 @@
                     },
                     success: function(rst){
                         $.LoadingOverlay("hide");
-                        swal("User Deleted Successfully", "Mail sent successfully in minutes.", "success");
+                        swal("polling Deleted Successfully", "Mail sent successfully in minutes.", "success");
                         location.reload();
 
                     },
@@ -156,12 +184,11 @@
 </script>
 @endsection
 @section('modals')
-    @include('admin.users.modals._new_user')
-
+    @include('admin.polling.modals._new_polling')
     <div id="modal">
     @php($index=0)        
-        @foreach($users as $user)
-            @include('admin.users.modals._new_edit')
+        @foreach($pollings as $polling)
+            @include('admin.polling.modals._new_edit')
         @php($index++)
         @endforeach
     </div>
