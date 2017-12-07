@@ -15,6 +15,9 @@ class CreateElectionStatusesTable extends Migration
     {
         Schema::create('election_statuses', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name');
+            $table->string('slug');
+            $table->string('class');
             $table->timestamps();
         });
     }
