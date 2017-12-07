@@ -1,5 +1,5 @@
 <!-- Create New Student Modal -->
-<div class="modal" id="edit-user{{$ward->id}}" tabindex="-1" role="dialog" aria-labelledby="modal-large" aria-hidden="true">
+<div class="modal" id="edit-permission{{$permission->id}}" tabindex="-1" role="dialog" aria-labelledby="modal-large" aria-hidden="true">
     <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
@@ -17,26 +17,17 @@
                     </div><hr/>
                     <div class="card card-body">
                         <div class="col-sm-12">
-                            <input type="hidden" class="form-control form-input" value="{{ $ward->id }}" id="id{{$index}}" placeholder="Username" required>
+                            <input type="hidden" class="form-control form-input" value="{{ $permission->id }}" id="id{{$index}}" placeholder="Username" required>
+                            
+                        </div> 
+                        <div class="col-sm-12">
                             <div class="form-group row">
                                 <label for="example-text-input">Name <span class="required">*</span></label>
-                                <input type="text" class="form-control form-input" value="{{ $ward->name }}" id="name{{$index}}" placeholder="Name" required>
+                                <input type="text" class="form-control form-input" name="pname{{$index}}" id="pnames{{$index}}" value="{{ $permission->name }}" placeholder="Name" required>
                             </div>
                             <div class="form-group row">
-                                <label for="example-text-input">State<span class="required">*</span></label>
-                                <select name="state" id="state{{$index}}" class="form-control form-input" required>
-                                    <option value="{{$ward->state->id}}">{{$ward->state->name}}</option>
-                                    <option value="">--select State--</option>
-                                    @foreach($states as $state)
-                                        <option value="{{$state['id']}}">{{$state['name']}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group row">
-                                <label for="example-text-input">Local Govt.<span class="required">*</span></label>
-                                <select class="form-control form-input" name="local" id="local{{$index}}" required>
-                                    <option value="{{$ward->lga->id}}">{{$ward->lga->name}}</option>
-                                </select>
+                                <label for="example-text-input">Label <span class="required">*</span></label>
+                                <input type="text" class="form-control form-input" name="plabel{{$index}}" id="plabels{{$index}}" value="{{ $permission->label }}" placeholder="Name" required>
                             </div>
                         </div> 
                     </div>
@@ -44,7 +35,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-alt-secondary create-hover" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success create-hover" id="updateWard{{$index}}"><i class="fa fa-check"></i> Update</button>
+                <button type="button" class="btn btn-success create-hover" id="updatePermission{{$index}}"><i class="fa fa-check"></i> Update</button>
             </div>
         </div>
     </div>

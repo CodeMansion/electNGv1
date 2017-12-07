@@ -148,9 +148,44 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $data = $request->except('_token');
+        if($data['req'] == 'UpdatePermission'){
+
+            \DB::beginTransaction();
+            try {
+                //Updating existing permissions 
+                $permission = Permission::findorfail($data['id']);
+                $permission->name = $data['pname'];
+                $permission->label = $data['plabel'];
+                $permission->save();
+                
+                \DB::commit();
+                return response()->json(['success'=> 'Permission Updated Successfully!','type'=>'success','title' =>'success'], 200);
+
+            } catch(Exception $e) {
+                \DB::rollback();
+                return response()->json(['error'=> 'Ooops! An Error Occured!'], 200);
+            }
+        }elseif($data['req'] == 'UpdateRole'){
+
+            \DB::beginTransaction();
+            try {
+                //Updating existing roles 
+                $role = Role::findorfail($data['role_id']);
+                $role->name = $data['name'];
+                $role->label = $data['label'];
+                $role->save();
+                
+                \DB::commit();
+                return response()->json(['success'=> 'Role Updated Successfully!','type'=>'success','title' =>'success'], 200);
+
+            } catch(Exception $e) {
+                \DB::rollback();
+                return response()->json(['error'=> 'Ooops! An Error Occured!'], 200);
+            }
+        }
     }
 
     /**
@@ -185,6 +220,25 @@ class RoleController extends Controller
                 \DB::rollback();
                 return response()->json(['error'=> 'Ooops! An Error Occured!'], 200);
             }
+        }
+    }
+    public function delete(Request $request){
+        $data = $request->except('_token');
+        if($data['req'] == 'DeleteRoles'){
+            $check = \DB::table('permission_role')->where('role_id',$data['id'])->first();
+            if(!isset($check)){
+                Role::find($data['id'])->delete();
+            }else{
+               return response()->json(['error'=> 'Ooops! An Error Occured!'], 200); 
+            }
+            
+        }elseif($data['req'] == 'DeletePermissions'){
+            $check = \DB::table('permission_role')->where('permission_id',$data['id'])->first();
+            if(!isset($check)){
+                Permission::find($data['id'])->delete();
+            }else{
+               return response()->json(['error'=> 'Ooops! An Error Occured!'], 200); 
+            }            
         }
     }
 }

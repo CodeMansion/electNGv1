@@ -9,7 +9,7 @@
                     <div class="block block-content title-hold">
                         <div class="col-md-12">
                             <h3 style="margin-bottom:5px;">
-                                <i class="si si-users"></i> Roles &amps; Permissions 
+                                <i class="si si-users"></i> Roles &amp; Permissions 
                                 <button data-toggle="modal" data-target="#new-role" class="btn btn-sm btn-primary create-hover" type="button">Add New Roles</button>
                                 <button data-toggle="modal" data-target="#new-permission" class="btn btn-sm btn-primary create-hover" type="button">Add New Permission</button>
                                 <button data-toggle="modal" data-target="#assign-role" class="btn btn-sm btn-primary create-hover" type="button">Assign</button>
@@ -175,17 +175,17 @@
                 });
             });/**/
         $('#delete').on("click",function(){
-            alert($(this).data('id'));
             $.ajax({
-                    url: "{{URL::route('Delete.ward')}}",
+                    url: "{{URL::route('Delete.each')}}",
                     method: "DELETE",
                     data:{
                         '_token': "{{csrf_token()}}",
                         'id': $(this).data('id'),
+                        'req' : "DeleteRoles"
                     },
                     success: function(rst){
                         $.LoadingOverlay("hide");
-                        swal("Ward Deleted Successfully", "Mail sent successfully in minutes.", "success");
+                        swal("Role Deleted Successfully", "Mail sent successfully in minutes.", "success");
                         location.reload();
 
                     },
@@ -195,6 +195,95 @@
                     }
                 });
         });
+        $('#deleteperm').on("click",function(){
+            $.ajax({
+                    url: "{{URL::route('Delete.each')}}",
+                    method: "DELETE",
+                    data:{
+                        '_token': "{{csrf_token()}}",
+                        'id': $(this).data('id'),
+                        'req' : "DeletePermissions"
+                    },
+                    success: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Permissions Deleted Successfully", "Mail sent successfully in minutes.", "success");
+                        location.reload();
+
+                    },
+                    error: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Oops! Error","An Error Occured!", "error");
+                    }
+                });
+        });
+        $('.add').hide();
+        $('.show_role').hide();
+        $('.add_role').click(function(){
+            $('.add').show();
+            $('.show_role').show();
+            $('.add_role').hide();
+            $('.role_table').hide();
+        })
+        $('.show_role').click(function(){
+            $('.add').hide();
+            $('.show_role').hide();
+            $('.add_role').show();
+            $('.role_table').show();
+        })
+        $("#modal .modal").each(function(i) {
+            $('#updatePermission'+i).on("click",function() {
+                var id=$('#id'+i).val();
+                $.LoadingOverlay("show");
+                $.ajax({
+                    url: "{{URL::route('roles.update')}}",
+                    method: "PATCH",
+                    data:{
+                        '_token': "{{csrf_token()}}",
+                        'id':id,
+                        'pname' : $('#pnames'+i).val(),
+                        'plabel': $('#plabels'+i).val(),
+                        'req' : "UpdatePermission"
+                    },
+                    success: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Permission Updated Successfully", "Mail sent successfully in minutes.", "success");
+                        location.reload();
+
+                    },
+                    error: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Oops! Error","An Error Occured!", "error");
+                    }
+                });
+            });   
+        });
+        $("#modal .modal").each(function(i) {
+            $('#updateRole'+i).on("click",function() {
+                var id=$('#roleid'+i).val();
+                $.LoadingOverlay("show");
+                $.ajax({
+                    url: "{{URL::route('roles.update')}}",
+                    method: "PATCH",
+                    data:{
+                        '_token': "{{csrf_token()}}",
+                        'role_id':$('#roleid'+i).val(),
+                        'name' : $('#name'+i).val(),
+                        'label': $('#label'+i).val(),
+                        'req' : "UpdateRole"
+                    },
+                    success: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Role Updated Successfully", "Mail sent successfully in minutes.", "success");
+                        location.reload();
+
+                    },
+                    error: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Oops! Error","An Error Occured!", "error");
+                    }
+                });
+            });   
+        });
     });   
 </script>
 @endsection
@@ -202,4 +291,18 @@
     @include('admin.roles.modals._new_roles')
     @include('admin.roles.modals._new_permission')
     @include('admin.roles.modals._assign_roles')
+    <div id="modal">
+        @php($index=0)        
+        @foreach($permissions as $permission)
+            @include('admin.roles.modals._new_edit_permission')
+            @php($index++)
+        @endforeach
+    </div>
+    <div id="modal">
+        @php($index=0)        
+        @foreach($roles as $role)
+            @include('admin.roles.modals._new_edit_role')
+            @php($index++)
+        @endforeach
+    </div>
 @endsection

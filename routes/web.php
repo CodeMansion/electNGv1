@@ -56,9 +56,10 @@ Route::group(['middleware'=>['auth']], function(){
     Route::group(['prefix' => 'roles'], function () {
         Route::get('/', array('as'=>'roles.index','uses'=>'RoleController@index'));
         Route::post('/store', array('as'=>'roles.store','uses'=>'RoleController@store'));
-        Route::post('/update', array('as'=>'roles.update','uses'=>'RoleController@update'));
+        Route::patch('/update', array('as'=>'roles.update','uses'=>'RoleController@update'));
         Route::post('/assign_permission', array('as'=>'roles.assign_permission','uses'=>'RoleController@assign_permission'));
         Route::delete('/delete', array('as'=>'Delete.assign_roles','uses'=>'RoleController@destroy'));
+        Route::delete('/delete_each', array('as'=>'Delete.each','uses'=>'RoleController@delete'));
     });
     /** Stop here for now **/ 
     //-- POLITICAL PARTIES ROUTES --//

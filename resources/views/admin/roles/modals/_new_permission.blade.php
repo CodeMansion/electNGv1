@@ -14,8 +14,11 @@
                 <div class="block-content" style="">
                     <div class="warning-well">
                         <em>Please note that the field marked with asterik (<span class="required">*</span>) are compulsory.</em>
-                    </div><hr/>
-                    <div class="card card-body">
+                    </div>
+                    <button class="btn btn-sm btn-primary create-hover add_role" type="button">Add New</button>
+                    <button class="btn btn-sm btn-default create-hover show_role" type="button">View Permission</button>
+                    <hr/>
+                    <div class="card card-body add">
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label for="example-text-input">Name <span class="required">*</span></label>
@@ -27,6 +30,39 @@
                             </div>
                         </div> 
                     </div>
+                    <table class="table table-condensed table-hover table-striped role_table">
+                        <thead>
+                            <tr>
+                                <th width="50"><input type="checkbox" name="" value=""></th>
+                                <th width="50"></th>
+                                <th>Name</th>
+                                <th>Label</th>
+                            </td>
+                        </thead>
+                        <tbody>
+                            @forelse($permissions as $perm)
+                                <tr>
+                                    <td><input type="checkbox" name="" value=""></td>
+                                    <td><img src="{{ asset('images/default.png') }}" width="26" height="26" /></td>
+                                    <td class="user-edit">
+                                        <a href="">{{$perm['name']}}</a><br/>
+                                        <span id="polling-view" style="display:none;color:grey;" style="font-size: 12px;"> | </span>
+                                    </td>
+                                    <td>{{$perm->label}}</td>
+                                    <td>
+                                        <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#edit-permission{{$perm['id']}}" ><i class="fa fa-edit"></i></a>
+                                        <a href="#" class="label label-danger" id="deleteperm" data-id="{{$perm->id}}"><i class="fa fa-times"></i></a>
+                                    </td>
+                                </tr>
+                            @empty
+                            <tr colspan="4">
+                                <div class="danger-well">
+                                    <em>There are no roles on this system.</em>
+                                </div>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="modal-footer">
