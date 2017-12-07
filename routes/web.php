@@ -21,8 +21,9 @@ Route::group(['middleware'=>['auth']], function(){
         // Route::get('/add-election', array('as'=>'ElectionNew','uses'=>'ElectionController@indexNew'));
         Route::post('/create-election', array('as'=>'Election.New','uses'=>'ElectionController@store'));
         Route::get('/election-view/{id?}', array('as'=>'Election.ViewOne','uses'=>'ElectionController@view'));
-        Route::post('/assign-party', array('as'=>'Election.AssignParty','uses'=>'ElectionController@assignPartyToElection'));
         Route::post('/ajax-calls', array('as'=>'ElectionAjax','uses'=>'ElectionController@AjaxProcess'));
+        Route::post('/change-status', array('as'=>'Election.ChangeStatus','uses'=>'ElectionController@changeStatus'));
+        Route::post('/check-passcode', array('as'=>'CheckPasscode','uses'=>'ElectionController@checkPasscode'));
     });
 
     //-- STATES ROUTES --//

@@ -50,7 +50,7 @@
                                                 </div>
                                             </div>
                                             <div class="clearfix"></div><hr/>
-                                            <p>Status: <span class="badge badge-primary"><i class="fa fa-cog mr-5"></i> Settings</span></p>
+                                            <p>Status: <span class="badge badge-{{$election->status->class}}"><i class="fa fa-cog mr-5"></i> {{$election->status->name}}</span></p>
                                         </div>
                                     </a>
                                 </div>

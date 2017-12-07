@@ -18,11 +18,15 @@ class Election extends Model
         return false;
     }
 
+    public function status(){
+        return $this->belongsTo('App\ElectionStatus','election_status_id');
+    }
+
     public function setNameAttribute($value){
         return $this->attributes['name'] = ucfirst($value);
     }
 
-    public static function find($id, $field = null){
+    public static function find($id,$field=null){
         if($field){
             return self::where($field, '=', $id)->firstOrFail();
         }
@@ -45,6 +49,21 @@ class Election extends Model
         return $ward['name'];
     }
 
+    public function state($id){
+        $state = State::find($id);
+        return strtoupper($state['name']);
+    }
+
+    public function pollingUsers($id) {
+        $user = User::find($id);
+        return strtoupper($user->profile->first_name.' '.$user->profile->last_name);
+    }
+
+    public function pollingCentres($id) {
+        $centre = PollingStation::find($id);
+        return strtoupper($centre['name']);
+    }
+
     public function fnAssignParties(){
         return $this->belongsToMany('App\PoliticalParty', 'pivot_election_party')
                 ->where("state_id", "=", config('constants.ACTIVE_STATE_ID'))
@@ -52,12 +71,25 @@ class Election extends Model
                 ->select(["political_parties.*"]);
     }
 
-    public function fnPollingUnits($id){
-        return $this->belongsToMany('App\PollingStation','pivot_election_polling_units')
+    public function fnApprovedPasscodes() {
+        $passcodes = \DB::table("pivot_election_users_passcode")
+                ->where("state_id","=",config('constants.ACTIVE_STATE_ID'))
+                ->where("election_id","=",$this->id);
+
+        return $passcodes;
+    }
+
+    public function fnPollingUnits(){
+        // return $this->belongsToMany('App\PollingStation','pivot_election_polling_units')
+        //         ->where("pivot_election_polling_units.state_id", "=", config('constants.ACTIVE_STATE_ID'))
+        //         ->where("pivot_election_polling_units.election_id", "=", $this->id);
+        //         // ->orderBy("name")
+        //         // ->select(["polling_stations.*"]);
+        $polling_list = \DB::table("pivot_election_polling_units")
                 ->where("pivot_election_polling_units.state_id", "=", config('constants.ACTIVE_STATE_ID'))
-                ->where("pivot_election_polling_units.election_id", "=", $id)
-                ->orderBy("name")
-                ->select(["polling_stations.*"]);
+                ->where("pivot_election_polling_units.election_id", "=", $this->id);
+
+        return $polling_list;
     }
 
 

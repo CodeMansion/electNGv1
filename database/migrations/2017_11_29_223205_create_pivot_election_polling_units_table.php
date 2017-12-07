@@ -20,6 +20,7 @@ class CreatePivotElectionPollingUnitsTable extends Migration
             $table->integer('ward_id')->unsigned()->index();
             $table->integer('lga_id')->unsigned()->index();
             $table->integer('polling_unit_id')->unsigned()->index();
+            $table->integer('user_id')->unsigned()->index()->nullable();
             $table->integer('status')->default(1);
             $table->timestamps();
         });
