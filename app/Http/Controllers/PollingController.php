@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\State;
 use App\Lga;
 use App\Ward;
-class WardController extends Controller
+use App\PollingStation;
+class PollingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,18 +16,21 @@ class WardController extends Controller
      */
     public function index()
     {
-        //this is use in getting wards and state from the database and passing it to the view through $data[];
+        //getting everything concerning the polling station and passing it to the view
         $data['states'] = State::all();
         $data['wards'] = Ward::all();
+        $data['pollings'] = PollingStation::all();
 
-        return view('admin.ward.index')->with($data);
+        return view('admin.polling.index')->with($data);
     }
 
-    public function state_lga(Request $request)
+    public function ward(Request $request)
     {
+        //this is use to automatically pass the view to the user
         $output="";
         $state = \Request::get('state_id');
-        $lga = \App\Lga::where('state_id','=',$state)->get();
+        $lga = \request::get('local_id');
+        $lga = \App\Ward::where('state_id','=',$state)->where('lga_id',$lga)->get();
         if($lga)
         {
             foreach ($lga as $key => $local) {
@@ -58,25 +62,26 @@ class WardController extends Controller
         $data = $request->except('_token');
         
         //Avoiding saving ward with the same exact data
-        if(!empty(Ward::whereName($data['name'])->whereStateId($data['state'])->whereLgaId($data['lga'])->first())){
-            return ['error'=> 'Ooops! This ward Already Exist!','type'=>'warning','title' =>'warning'];
+        if(!empty(PollingStation::whereName($data['name'])->whereStateId($data['state'])->whereLgaId($data['lga'])->whereWardId($data['ward'])->first())){
+            return ['error'=> 'Ooops! This PollingStation Already Exist!','type'=>'warning','title' =>'warning'];
         }
 
-        if($data['req'] == 'newWard'){
+        if($data['req'] == 'newpolling'){
 
             \DB::beginTransaction();
             try {
-                //saving new ward in to the database
-                $ward = new Ward();
-                $ward->slug = bin2hex(random_bytes(64));
-                $ward->state_id = $data['state'];
-                $ward->lga_id = $data['lga'];
-                $ward->name = $data['name'];
-                $ward->code = bin2hex(random_bytes(4));
-                $ward->save();
+                //saving new pollingstation
+                $polling = new PollingStation();
+                $polling->slug = bin2hex(random_bytes(64));
+                $polling->state_id = $data['state'];
+                $polling->lga_id = $data['lga'];
+                $polling->ward_id = $data['ward'];
+                $polling->name = $data['name'];
+                $polling->code = bin2hex(random_bytes(4));
+                $polling->save();
                 
                 \DB::commit();
-                return response()->json(['success'=> 'Ward Created Successfully!','type'=>'success','title' =>'success'], 200);
+                return response()->json(['success'=> 'PollingStation Created Successfully!','type'=>'success','title' =>'success'], 200);
 
             } catch(Exception $e) {
                 \DB::rollback();
@@ -118,24 +123,25 @@ class WardController extends Controller
         $data = $request->except('_token');
         //if this are still the same while update it!
         //so this check if you are trying update to the value of others! Beforeupdate is done 
-        if(!empty(Ward::whereName($data['name'])->whereStateId($data['state'])->whereLgaId($data['lga'])->first())){
-            return ['error'=> 'Ooops! This ward Already Exist!','type'=>'warning','title' =>'warning'];
+        if(!empty(PollingStation::whereName($data['name'])->whereStateId($data['state'])->whereLgaId($data['lga'])->whereWardId($data['ward'])->first())){
+            return ['error'=> 'Ooops! This PollingStation Already Exist!','type'=>'warning','title' =>'warning'];
         }
-        if($data['req'] == 'UpdateWard'){
+        if($data['req'] == 'Updatepolling'){
 
             \DB::beginTransaction();
             try {
-                //updating the ward
-                $ward = ward::findorfail($data['id']);
-                //$ward->slug = bin2hex(random_bytes(64));
-                $ward->state_id = $data['state'];
-                $ward->lga_id = $data['lga'];
-                $ward->name = $data['name'];
-                //$ward->code = bin2hex(random_bytes(4));
-                $ward->save();
+                //updating pollingstation
+                $polling = PollingStation::findorfail($data['id']);
+                //$polling->slug = bin2hex(random_bytes(64));
+                $polling->state_id = $data['state'];
+                $polling->lga_id = $data['lga'];
+                $polling->ward_id = $data['ward'];
+                $polling->name = $data['name'];
+                //$polling->code = bin2hex(random_bytes(4));
+                $polling->save();
                 
                 \DB::commit();
-                return response()->json(['success'=> 'Ward Updated Successfully!','type'=>'success','title' =>'success'], 200);
+                return response()->json(['success'=> 'PollingStation Updated Successfully!','type'=>'success','title' =>'success'], 200);
 
             } catch(Exception $e) {
                 \DB::rollback();
@@ -152,7 +158,8 @@ class WardController extends Controller
      */
     public function destroy(Request $request)
     {
-        //delete ward with this id
-        Ward::find($request->id)->delete();
+
+        //deleting the data releted to each polling station
+        PollingStation::find($request->id)->delete();
     }
 }
