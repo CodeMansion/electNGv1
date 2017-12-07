@@ -45,8 +45,12 @@
         <script src="{{ asset('js/codebase.js') }}"></script>
 
         <script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
+<<<<<<< HEAD
         <script src="{{ asset('js/plugins/sweetalert/sweetalert.min.js') }}"></script>
 
+=======
+        
+>>>>>>> Austins
         <!---notification messages---->
         <script src="{{ asset('js/notify.min.js') }}"></script>
         @if(\Session::has('error'))

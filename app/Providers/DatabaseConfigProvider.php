@@ -18,13 +18,14 @@ class DatabaseConfigProvider extends ServiceProvider
         {
             $active = \DB::table("pivot_active_state")->first();
             if(isset($active)){
-                $state = State::find($active->state_id);
+                $state = State::findorfail($active->state_id);
                 config()->set([
                     'constants.ACTIVE_STATE_NAME' => $state['name'],
                     'constants.ACTIVE_STATE_ID' => $active->state_id
                 ]);
             }
-        } 
+            
+        }
     }
 
     /**
