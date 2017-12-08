@@ -22,7 +22,6 @@
                             <em>Please follow the instructions and fill the form carefully. Note that fields make with asterisk (<span class="required">*</span>) are compulsory.</em>
                         </div><hr/>
                         <div class="card card-body">
-                    
                             <div class="col-sm-12">
                                 <div class="form-group row">
                                     <div class="col-md-4">
@@ -40,18 +39,18 @@
                                     </div>
                                     <div class="col-md-8">
                                         <label for="example-text-input"><strong>{{$election->lga($unit->lga_id)}}</strong></label>
-                                        <input type="hidden" id="lga_id{{$index}}" name="lga_id" value="{{$unit->lga_id}}">
+                                        <input type="hidden" id="lga_id{{$index}}" value="{{$unit->lga_id}}">
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group row">
                                     <div class="col-md-4">
-                                        <label for="example-text-input">Ward ></label>
+                                        <label for="example-text-input">Ward </label>
                                     </div>
                                     <div class="col-md-8">
                                         <label for="example-text-input"><strong>{{$election->ward($unit->ward_id)}}</strong></label>
-                                        <input type="hidden" id="ward_id{{$index}}" name="ward_id" value="{{$unit->ward_id}}">
+                                        <input type="hidden" id="ward_id{{$index}}" value="{{$unit->ward_id}}">
                                     </div>
                                 </div>
                             </div>
@@ -61,8 +60,8 @@
                                         <label for="example-text-input">Polling Centre </label>
                                     </div>
                                     <div class="col-md-8">
-                                        <label for="example-text-input"><strong>{{$unit->polling_station_id}}</strong></label>
-                                        <input type="hidden" id="polling_unit_id{{$index}}" name="polling_unit_id" value="{{$unit->polling_station_id}}">
+                                        <label for="example-text-input"><strong>{{$election->pollingCentres($unit->polling_station_id)}}</strong></label>
+                                        <input type="hidden" id="polling_unit_id{{$index}}" value="{{$unit->polling_station_id}}">
                                     </div>
                                 </div>
                             </div>
@@ -96,5 +95,6 @@
     </div>
 </div>
 <!-- END Create New Student Modal -->
+
 
 

@@ -16,7 +16,9 @@
                         <div class="col-md-12">
                             <h3 style="margin-bottom:5px;">
                                 <i class="si si-feed"></i> Elections 
-                                <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button">Add Election</button>
+                                @can('add_elections')
+                                    <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button"> Add Election</button>
+                                @endcan
                                 <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
                             </h3><hr/>
                             <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>

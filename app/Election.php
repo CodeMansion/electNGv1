@@ -108,4 +108,32 @@ class Election extends Model
         
         return $parties;
     }
+
+    public function get_result_summary($type=null)
+    {
+        $Ret = [];
+       
+        //getting the parties involved in the election
+        $parties = $this->fnAssignParties()->get();
+
+        //collecting the result
+        $result = $this->get_polling_result()->get();
+        
+        //looping through the parties to get individual party first
+        foreach($parties as $i => $party) {
+            $code = strtolower($party['code']);
+            $Ret[$code] = 0;
+        } 
+
+        //looping through the result to able to calculate total for each parties 
+        //under this election
+        foreach($result as $k => $val){
+            foreach($parties as $i => $party) {
+                $code = strtolower($party['code']);
+                $Ret[$code] += (int)$val->$code;
+            }
+        }
+
+        return $Ret;
+    }
 }

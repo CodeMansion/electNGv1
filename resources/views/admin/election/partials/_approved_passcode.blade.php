@@ -15,13 +15,19 @@
                 @foreach($approvedPasscodes as $code)
                     <tr>
                         <td>{{$count}}</td>
-                        <td><a href="javascript:void(0);" class="view-passcode" id="{{$code->id}}">{{$code->passcode}}</a></td>
+                        <td>
+                            @if($code->status == 1)
+                                <span class="view-passcode" id="{{$code->id}}">{{$code->passcode}}</span>
+                            @else
+                                <a href="javascript:void(0);" class="view-passcode" id="{{$code->id}}">{{$code->passcode}}</a>
+                            @endif
+                        </td>
                         <td>{{str_limit($code->token,20)}}</td>
                         <td>
                             @if($code->status == 1)
                                 <span class="badge badge-warning"> Unused</span>
                             @elseif($code->status == 2)
-                                <span class="badge badge-primary"> Inuse</span>
+                                <span class="badge badge-success"> Used</span>
                             @else
                                 <span class="badge badge-success"> Used</span>
                             @endif

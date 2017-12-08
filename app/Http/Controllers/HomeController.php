@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Election;
+
 class HomeController extends Controller
 {
 
@@ -14,6 +16,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboard');
+        $data['election'] = Election::where("election_status_id",'=',3)->first();
+        return view('admin.dashboard')->with($data);
     }
 }

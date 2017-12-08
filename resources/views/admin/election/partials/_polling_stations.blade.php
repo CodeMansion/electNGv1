@@ -25,10 +25,13 @@
                     @endif
                 </td>
                 <td>
-                    <button type="button" class="btn-block-option create-hover" data-toggle="modal" data-target="#assignUsers{{$unit->id}}"><i class="si si-link"></i></button> 
-                    @if($election['election_status_id'] == 3)
-                    @else
+                    @if($election['election_status_id'] == 4)
+
+                    @elseif($election['election_status_id'] == 2 || $election['election_status_id'] == 1)
+                        <button type="button" class="btn-block-option create-hover" data-toggle="modal" data-target="#assignUsers{{$unit->id}}"><i class="si si-link"></i></button> 
                         | <button type="button" class="btn-block-option create-hover" data-toggle="modal" data-target=""><i class="si si-close"></i></button>
+                    @elseif($election['election_status_id'] == 3)
+                        <button type="button" class="btn-block-option create-hover" data-toggle="modal" data-target="#assignUsers{{$unit->id}}"><i class="si si-link"></i></button> 
                     @endif
                 </td>
             </tr>
