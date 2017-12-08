@@ -45,12 +45,8 @@
         <script src="{{ asset('js/codebase.js') }}"></script>
 
         <script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
-<<<<<<< HEAD
         <script src="{{ asset('js/plugins/sweetalert/sweetalert.min.js') }}"></script>
 
-=======
-        
->>>>>>> Austins
         <!---notification messages---->
         <script src="{{ asset('js/notify.min.js') }}"></script>
         @if(\Session::has('error'))
@@ -77,6 +73,14 @@
                 $.notify('{!! \Session::get('warning') !!}', "warning");
             </script>
         @endif
+
+        <script>
+            $(document).ready(function(){
+                $("#close-notify").on("click", function(){
+                    $("#close").hide();
+                });
+            });
+        </script>
 
         <!-- extra javascript plugins included here -->
         @yield('extra_script')

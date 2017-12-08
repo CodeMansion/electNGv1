@@ -24,6 +24,7 @@ Route::group(['middleware'=>['auth']], function(){
         Route::post('/ajax-calls', array('as'=>'ElectionAjax','uses'=>'ElectionController@AjaxProcess'));
         Route::post('/change-status', array('as'=>'Election.ChangeStatus','uses'=>'ElectionController@changeStatus'));
         Route::post('/check-passcode', array('as'=>'CheckPasscode','uses'=>'ElectionController@checkPasscode'));
+        Route::put('/submit-result', array('as'=>'SubmitResult','uses'=>'ElectionController@submitResult'));
     });
 
     //-- STATES ROUTES --//

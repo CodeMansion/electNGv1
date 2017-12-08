@@ -62,4 +62,7 @@ function bulkUpload($type,$file=null)
             }
         }
     }
+
+    //display charts function
+    
 }

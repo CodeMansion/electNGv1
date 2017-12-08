@@ -1,12 +1,15 @@
 @extends('partials.app')
 @section('extra_style')
-    <!--customize styling for student resource-->
+    <!-- customize styling for student resource-->
     <link href="{{asset('js/plugins/datatables/datatables.min.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('js/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')}}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
     <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('js/plugins/select2/select2.min.css')}}">
     <link rel="stylesheet" href="{{ asset('js/plugins/select2/select2-bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('js/plugins/slick/slick.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('js/plugins/slick/slick-theme.min.css') }}">
+    {!! Charts::assets() !!}
 @endsection
 @section('content')
     <main id="main-container">
@@ -17,7 +20,7 @@
                     <div class="block block-content title-hold">
                         <div class="col-md-12">
                             <h3 style="margin-bottom:5px;">
-                                <i class="si si-feed"></i> {{$election['name']}} <span class="badge badge-{{$election->status->class}}"><i class="fa fa-cog mr-5"></i> {{$election->status->name}}</span>
+                                <i class="si si-feed"></i> {{$election['name']}} <span class="badge badge-{{$election->status->class}}"><i class=""></i> {{$election->status->name}}</span>
                                 <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
                             </h3><hr/>
                             <p>
@@ -68,6 +71,10 @@
                             <li class="nav-item"><a class="nav-link" href="#results">Polling Results</a></li>
                             <li class="nav-item"><a class="nav-link" href="#centres">Election Centres</a></li>
                             <li class="nav-item"><a class="nav-link" href="#users">Approved Users</a></li>
+                            @if($election['election_status_id'] == 3)
+                                <li class="nav-item"><a class="nav-link" href="#poll-result">Submit Result</a></li>
+                            @endif
+                            
                             <li class="nav-item ml-auto">
                                 <div class="block-options mr-15">
                                     <div class="dropdown ">
@@ -75,10 +82,13 @@
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-bell mr-5"></i>Election Status</a>
                                             <a data-toggle="modal" data-target="#assignUsers" class="dropdown-item" href="javascript:void(0)">
-                                                <i class="si si-action-redo mr-5"></i> Assign Officials
+                                                <i class="si si-action-redo mr-5"></i> Assign Officials to stations
                                             </a>
                                             <a data-toggle="modal" data-target="#userPasscode" class="dropdown-item" href="javascript:void(0)">
                                                 <i class="si si-magic-wand mr-5"></i> Query User Passcode
+                                            </a>
+                                            <a class="dropdown-item" href="javascript:void(0)">
+                                                <i class="si si-grid mr-5"></i> Export CSV
                                             </a>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item" href="{{URL::route('Election.View')}}">
@@ -97,8 +107,7 @@
                         </ul>
                         <div class="block-content tab-content">
                             <div class="tab-pane active" id="statistics" role="tabpanel">
-                                <h4 class="font-w400">Infographics </h4>
-                                <p>...</p>
+                                @include('admin.election.partials._infographics')
                             </div>
                             <div class="tab-pane" id="results" role="tabpanel">
                                 <h4 class="font-w400">Polling Results</h4>
@@ -111,6 +120,12 @@
                                 <h4 class="font-w400">Approved Officials</h4>
                                 @include('admin.election.partials._approved_passcode')
                             </div>
+                            @if($election['election_status_id'] == 3)
+                            <div class="tab-pane" id="poll-result" role="tabpanel">
+                                <h4 class="font-w400">Submit Polling Result</h4>
+                                @include('admin.election.partials._submit_poll')
+                            </div>
+                            @endif
                         </div>
                     </div>
                     <!-- END Block Tabs With Options Default Style -->
@@ -119,8 +134,17 @@
         </div>
     </main>
 @endsection
+@section('modals')
+    @php($index=0)
+    @foreach($pollingUnits as $unit)
+        @include('admin.election.modals._assign_users_stations')
+    @php($index++)
+    @endforeach
+@endsection
 @section('extra_script')
-    <script src="{{ asset('js/pages/datatable.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/plugins/slick/slick.min.js') }}"></script>
+
+    <!-- <script src="{{ asset('js/pages/datatable.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/plugins/datatables/datatables.min.js')}}" type="text/javascript"></script>
     <script src="{{ asset('js/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')}}" type="text/javascript"></script>
     <script src="{{ asset('js/pages/table-datatables-managed.min.js') }}" type="text/javascript"></script>
@@ -129,47 +153,15 @@
     <script src="{{ asset('js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ asset('js/plugins/select2/select2.full.min.js')}}"></script>
 
-    <script src="{{ asset('js/pages/be_forms_plugins.js') }}"></script>
+    <script src="{{ asset('js/pages/be_forms_plugins.js') }}"></script> -->
     <script type="text/javascript">
         $(document).ready(function() {
-            //view assign parties form
-            $("#viewAsnForm").on("click", function() {
-                $("#assignParties").show();
-                $("#viewAsnForm").hide();
-                $("table.table-striped").hide();
-            });
-
-            //closing the assign form
-            $("#cls").on("click", function() {
-                $("#viewAsnForm").show();
-                $("#assignParties").hide();
-                $("table.table-striped").show();
-            });
-
-            //submit new user form
-            $('#submit').on("click",function() {
-                $.LoadingOverlay("show");
-                $.ajax({
-                    url: "{{URL::route('ElectionAjax')}}",
-                    method: "POST",
-                    data:{
-                        '_token': "{{csrf_token()}}",
-                        'party' : $('select[name=party').val(),
-                        'election_id' : <?php echo $election['id']; ?>,
-                        'req' : "assignParty"
-                    },
-                    success: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Assigned Successfully!", rst, "success");
-                        location.reload();
-                    },
-                    error: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Oops! Error","An Error Occured!", "error");
-                    }
-                });
-            }); 
-
+            //submiting polling result
+            $("#is-validating").hide();
+            $("#polling-details").hide();
+            $("#has-error").hide();
+            $("#refresh").hide();
+            
             //assigning a user to a polling centre under a state
             $("#modal .modal").each(function(index){
                 $("#assignUser"+index).on("click",function() {
@@ -198,76 +190,90 @@
                     });
                 }); 
             });
+            
+            
+            $("#check-passcode").on("click", function() {
+                $("#refresh").show();
+                var passcode = $("input[name=passcode]").val();
+                if(passcode.length > 6 ){
+                    alert('Invalid passcode!');
+                } else {
+                    $("input[name=passcode]").attr('disabled',true);
+                    $("#is-validating").show();
+                    $.ajax({
+                        url: "{{URL::route('CheckPasscode')}}",
+                        method: "POST",
+                        data:{
+                            '_token': "{{csrf_token()}}",
+                            'passcode' : passcode,
+                            'req' : "checkCode"
+                        },
+                        success: function(rst){
+                            $("#is-validating").hide();
+                            $("#has-error").hide();
+                            $("#polling-details").html(rst);
+                            $("#polling-details").show();
+                        },
+                        error: function(rst){
+                            $("#is-validating").hide();
+                            $("#polling-details").hide();
+                            $("#has-error").show();
+                        }
+                    });
+                }
+            });
 
-            //changing an election status
-            $("#completed").on("click",function() {
-                $.LoadingOverlay("show");
+            $("select[name=lga_id]").on("change", function(){
                 $.ajax({
                     url: "{{URL::route('ElectionAjax')}}",
                     method: "POST",
                     data:{
                         '_token': "{{csrf_token()}}",
-                        'election_slug' : <?php echo $election['slug']; ?>,
-                        'type' : "completed",
-                        'req' : "changeStatus"
+                        'lga_id' : $(this).val(),
+                        'req' : "displayWard"
                     },
                     success: function(rst){
                         $.LoadingOverlay("hide");
-                        swal("Successfully Done!", rst, "success");
-                        location.reload();
+                        $("select[name=ward_id]").html(rst);
                     },
                     error: function(rst){
                         $.LoadingOverlay("hide");
                         swal("Oops! Error","An Error Occured!", "error");
                     }
                 });
-            });    
+            });
 
-            //submiting polling result
-            $("#is-validating").hide();
-            $("#polling-details").hide();
-
-            $("#check-passcode").on("click", function() {
-                $("input[name=passcode]").attr('disabled',true);
-                var passcode = $("input[name=passcode]").val();
-                $("#is-validating").show();
+            $("select[name=ward_id]").on("change", function(){
                 $.ajax({
-                    url: "{{URL::route('CheckPasscode')}}",
+                    url: "{{URL::route('ElectionAjax')}}",
                     method: "POST",
                     data:{
                         '_token': "{{csrf_token()}}",
-                        'passcode' : passcode,
-                        'req' : "checkCode"
+                        'lga_id' : $('select[name=lga_id]').val(),
+                        'ward_id' : $(this).val(),
+                        'req' : "displayCentre"
                     },
                     success: function(rst){
-                        $("#is-validating").hide();
-                        $("#polling-details").html(rst);
-                        $("#polling-details").show();
+                        $("select[name=polling_unit_id]").html(rst);
                     },
                     error: function(rst){
-                        $("#is-validating").hide();
-                        $("#polling-details").html("<p>Error</p>");
-                        $("#polling-details").show();
+                        $.LoadingOverlay("hide");
+                        swal("Oops! Error","An Error Occured!", "error");
                     }
                 });
-            }); 
+            });
+
+            //implementing refresh
+            $("#refresh").on('click', function(){
+                $("input[name=passcode]").attr('disabled',false);
+                $("input[name=passcode]").val('');
+            });
         });    
     </script>
     <script>
         jQuery(function () {
             // Init page helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Input + Range Sliders + Tags Inputs plugins)
-            Codebase.helpers(['datepicker', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider', 'tags-inputs']);
+            Codebase.helpers(['datepicker', 'slick', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider', 'tags-inputs']); 
         });
     </script>
-@endsection
-@section('modals')
-    <!-- @php($index=0)
-    @foreach($pollingUnits as $unit)
-        @include('admin.election.modals._assign_users_stations')
-    @php($index++)
-    @endforeach -->
-
-    @foreach($pollingResults as $result)
-        @include('admin.election.modals._submit_polling_result')
-    @endforeach
 @endsection

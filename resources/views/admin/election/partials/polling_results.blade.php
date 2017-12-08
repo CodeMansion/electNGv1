@@ -4,11 +4,11 @@
             <th>S/N</th>
             <th>LGA</th>
             <th>WARD</th>
+            <th>STATUS</th>
             <th>POLLING CENTRES</th>
             <th>ACCR VOTERS</th>
             <th>VOID VOTERS</th>
             <th>CONFIRMED VOTERS</th>
-            <th>STATUS</th>
             @foreach($electionParties as $party)
                 <th><strong><?php echo strtoupper($party->code); ?></strong></th>
             @endforeach
@@ -29,16 +29,16 @@
                     <span class="create-hover" data-toggle="tooltip" title="{{$election->centre($result->polling_station_id)}}">
                     <i class="si si-eye"></i></span>
                 </td>
-                <td class="text-center">{{$result->accr_voters}}</td>
-                <td class="text-center">{{$result->void_voters}}</td>
-                <td class="text-center">{{$result->confirmed_voters}}</td>
                 <td class="text-center">
                     @if($result->status == 1)
                         <span class="badge badge-danger">Unprocessed</span>
                     @elseif($result->status == 2)
-                        
+                        <span class="badge badge-success">Processed</span>
                     @endif
                 </td>
+                <td class="text-center">{{$result->accr_voters}}</td>
+                <td class="text-center">{{$result->void_voters}}</td>
+                <td class="text-center">{{$result->confirmed_voters}}</td>
                 @foreach($electionParties as $party)
                     @php($code=strtolower($party['code']))
                     <td class="text-center"><strong><?php echo $result->$code; ?></strong></td>
@@ -49,6 +49,7 @@
                     </td>
                 @endif
             </tr>
+            
         @php($count++)
         @endforeach
     </tbody>

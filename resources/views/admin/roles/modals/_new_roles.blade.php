@@ -19,11 +19,11 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label for="example-text-input">Name <span class="required">*</span></label>
-                                <input type="text" class="form-control form-input" name="name" placeholder="Name" required>
+                                <input type="text" class="form-control form-input" name="name" placeholder="Name E.g (System Admin)" required>
                             </div>
                             <div class="form-group row">
                                 <label for="example-text-input">Label <span class="required">*</span></label>
-                                <input type="text" class="form-control form-input" name="label" placeholder="Name" required>
+                                <input type="text" class="form-control form-input" name="label" placeholder="Label E.g (System Administrator)" required>
                             </div>
                         </div> 
                     </div>

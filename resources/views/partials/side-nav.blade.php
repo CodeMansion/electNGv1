@@ -68,30 +68,30 @@
             <!-- Side Navigation -->
             <div class="content-side content-side-full">
                 <ul class="nav-main">
-                    <li><a href="{{URL::route('Dashboard')}}"><i class="si si-cup"></i><span class="sidebar-mini-hide">Dashboard</span></a></li>
-                    <li><a href="{{URL::route('Election.View')}}"><i class="si si-trophy"></i><span class="sidebar-mini-hide">Elections</span></a></li>
+                    @can('view_dashboard')
+                        <li><a href="{{URL::route('Dashboard')}}"><i class="si si-home"></i><span class="sidebar-mini-hide">Dashboard</span></a></li>
+                    @endcan
+                    @can('view_elections')
+                        <li><a href="{{URL::route('Election.View')}}"><i class="si si-trophy"></i><span class="sidebar-mini-hide">Elections</span></a></li>
+                    @endcan
                     <li><a href="{{URL::route('State.View')}}"><i class="si si-cup"></i><span class="sidebar-mini-hide">States</span></a></li>
-<<<<<<< HEAD
-                    <li><a href="{{URL::route('lga.View')}}"><i class="si si-energy"></i><span class="sidebar-mini-hide">Local Govt Areas</span></a></li>
-                    <li><a href="#"><i class="si si-directions"></i><span class="sidebar-mini-hide">Poll Stations</span></a></li>
-=======
                     <li><a href="#"><i class="si si-energy"></i><span class="sidebar-mini-hide">Local Govt Areas</span></a></li>
                     <li><a href="{{URL::route('ward.index')}}"><i class="si si-directions"></i><span class="sidebar-mini-hide">Wards</span></a></li>
-                    <li><a href="{{URL::route('polling.index')}}"><i class="si si-directions"></i><span class="sidebar-mini-hide">Poll Stations</span></a></li>
->>>>>>> Austins
+                    <li><a href="{{URL::route('polling.index')}}"><i class="si si-note"></i><span class="sidebar-mini-hide">Poll Stations</span></a></li>
                     <li><a href="{{URL::route('PP.View')}}"><i class="si si-list"></i><span class="sidebar-mini-hide">Political Parties</span></a></li>
-                         
+
+                    @can('view_dashboard')    
                     <li class="nav-main-heading"><span class="sidebar-mini-visible">___</span><span class="sidebar-mini-hidden">Addons</span></li>
                     <li><a href="{{URL::route('Users.View')}}"><i class="si si-users"></i><span class="sidebar-mini-hide">Users</span></a></li>
                     <li><a class="nav-submenu" data-toggle="nav-submenu" href="#"><i class="si si-settings"></i><span class="sidebar-mini-hide">System Settings</span></a>
                         <ul>
-                            <li><a href="{{URL::route('roles.index')}}"><!-- <i class="si si-directions"></i. --><span class="sidebar-mini-hide">Roles/Permission</span></a></li>
                             <li><a href="#">System Backup</a></li>
                             <li><a href="{{URL::route('preference.uploadView')}}">Bulk Upload</a></li>
                             <li><a href="#">Preferences</a></li>
-                            <li><a href="#">Roles & Permissions</a></li>
+                            <li><a href="{{URL::route('roles.index')}}">Roles & Permissions</a></li>
                        </ul>
                     </li> 
+                    @endcan
                 </ul>
             </div>
         </div>

@@ -9,9 +9,15 @@ use App\Election;
 use App\PoliticalParty;
 use App\State;
 use App\Lga;
+use App\Ward;
 use App\PollingStation;
 use App\ElectionResultIndex;
 use App\User;
+
+use App\Mail\SendPasscode;
+
+use Charts;
+use Mail;
 
 class ElectionController extends Controller
 {
@@ -152,6 +158,19 @@ class ElectionController extends Controller
             return view('admin.election.modals.partials._populate_lgas')->with($lga);
         }
 
+        if($data['req'] == 'displayWard') {
+            $lga['wards'] = Ward::where('state_id','=',config('constants.ACTIVE_STATE_ID'))
+                            ->where('lga_id','=',$data['lga_id'])->get();
+            return view('admin.election.modals.partials._populate_wards')->with($lga);
+        }
+
+        if($data['req'] == 'displayCentre') {
+            $lga['centres'] = PollingStation::where('state_id','=',config('constants.ACTIVE_STATE_ID'))
+                            ->where('lga_id','=',$data['lga_id'])
+                            ->where('ward_id','=',$data['ward_id'])->get();
+            return view('admin.election.modals.partials._populate_centres')->with($lga);
+        }
+
         if($data['req'] == 'assignUsers') {
             \DB::beginTransaction();
             try {
@@ -198,9 +217,13 @@ class ElectionController extends Controller
                     'passcode'=>$PassCode,
                     'token'=>bin2hex(random_bytes(64))
                 ]);
+                
+                $user = User::find($data['user_id']);
+                $details['user'] = $user;
+                $details['passcode'] = $PassCode;
 
                 //sending the passcode to user through email and text message
-
+                \Mail::to($user['email'])->send(new SendPasscode($details));
 
                 \DB::commit();
                 return "User has been assigned to polling centre successfully.";
@@ -297,32 +320,85 @@ class ElectionController extends Controller
         $data = $request->except('_token');
 
         if($data['req'] == 'checkCode'){
+
             $codeInfo = \DB::table("pivot_election_users_passcode")->where('passcode','=',$data['passcode'])->first();
             $param['user'] = User::find($codeInfo->user_id);
             $param['election'] = Election::find($codeInfo->election_id);
+
             //getting the the election index code
             $IndexCode = ElectionResultIndex::where('election_id','=',$codeInfo->election_id)
                                     ->where('state_id','=',$codeInfo->state_id)->first();
             $IC = $IndexCode['election_code'];
+
             //query the election result table
             $resultInfo = \DB::table("polling_result_$IC")
                             ->where('election_id','=',$codeInfo->election_id)
                             ->where('state_id','=',$codeInfo->state_id)
                             ->where('lga_id','=',$codeInfo->lga_id)
-                            ->where('ward_id','=',$codeInfo->lga_id)
+                            ->where('ward_id','=',$codeInfo->ward_id)
                             ->where('polling_station_id','=',$codeInfo->polling_station_id)
                             ->first();
+
             $param['resultInfo'] = $resultInfo;
+            $param['passcode'] = $codeInfo->passcode;
+            $param['codeStatus'] = $codeInfo->status;
             $param['electionParties'] = $param['election']->fnAssignParties()->get();
+
             $param['pollingResult'] = \DB::table("polling_result_$IC")
                             ->where('election_id','=',$codeInfo->election_id)
                             ->where('state_id','=',$codeInfo->state_id)
                             ->where('lga_id','=',$codeInfo->lga_id)
-                            ->where('ward_id','=',$codeInfo->lga_id)
+                            ->where('ward_id','=',$codeInfo->ward_id)
                             ->where('polling_station_id','=',$codeInfo->polling_station_id)
                             ->first();
 
             return view('admin.election.modals.partials._view_result_details')->with($param);
+        }
+    }
+
+    public function submitResult(Request $request)
+    {
+        $data = $request->all();
+
+        \DB::beginTransaction();
+        try{
+            //gettting the political parties
+            $param['election'] = Election::find($data['election_id']);
+            $param['electionParties'] = $param['election']->fnAssignParties()->get();
+            //getting the election index code
+            $IndexCode = ElectionResultIndex::where('election_id','=',$data['election_id'])
+                            ->where('state_id','=',$data['state_id'])->first();
+            $IC = $IndexCode['election_code'];
+
+            //collating the dataset collect from the user
+            $new = [];
+            foreach($param['electionParties'] as $i){
+                $code = strtolower($i['code']);
+                $new['accr_voters'] = (int)$data['accr_voters'];
+                $new['void_voters'] = (int)$data['void_voters'];
+                $new['confirmed_voters'] = (int)$data['confirmed_voters'];
+                $new['status'] = 2;
+                $new[$code] = (int)$data[$code];
+            }
+
+            // dd($new);
+            //updating the the election result with data from the polling station
+            $resultInfo = \DB::table("polling_result_$IC")
+                    ->where('election_id','=',$data['election_id'])
+                    ->where('state_id','=',$data['state_id'])
+                    ->where('lga_id','=',$data['lga_id'])
+                    ->where('ward_id','=',$data['ward_id'])
+                    ->where('polling_station_id','=',$data['polling_station_id'])
+                    ->update($new);
+
+            //marking the passcode as used and making sure it is not used the second time
+            \DB::table("pivot_election_users_passcode")->where('passcode','=',$data['passcode'])->update(['status'=>2]);
+            
+            \DB::commit();
+            return redirect()->back()->with('success','Adding serve.');
+                        
+        } catch(Exception $e) {
+
         }
     }
 
@@ -331,13 +407,64 @@ class ElectionController extends Controller
     {
         $data['election'] = Election::find($id,'slug');
         $data['users'] = User::all();
+        $data['lgas'] = Lga::where("state_id","=",config('constants.ACTIVE_STATE_ID'))->get();
         $data['electionParties'] = $data['election']->fnAssignParties()->get();
         $data['units'] = Election::find($id,'slug');
         $data['pollingUnits'] = $data['election']->fnPollingUnits()->get();
         $data['politicalParties'] = PoliticalParty::orderBy('code','ASC')->get();
         $data['pollingResults'] = $data['election']->get_polling_result()->get();
         $data['approvedPasscodes'] = $data['election']->fnApprovedPasscodes()->get();
+        $data['resultSummary'] = $data['election']->get_result_summary();
+        $data['pieChart'] = $this->displayCharts('pie',$data['election']);
+        $data['barChart'] = $this->displayCharts('bar',$data['election']);
         
         return view('admin.election.view-one')->with($data);
+    }
+
+    protected function displayCharts($type=null,$election=null)
+    {
+        if($type == 'pie'){
+            $data = [];
+            $value = [];
+            $count = 0;
+            $new = [];
+            foreach($election->get_result_summary() as $key => $v){
+                $data[$count] = $key;
+                $value[$count] = $v;
+                $count++;
+            }
+            array_values($data);
+            array_values($value);
+            
+            $pieChart = \Charts::create('pie', 'highcharts')
+                ->title('Show Result With Pie Chart')
+                ->labels($data)
+                ->values($value)
+                ->responsive(false);
+
+            return $pieChart;
+        }
+
+        if($type == 'bar'){
+            $data = [];
+            $value = [];
+            $count = 0;
+            $new = [];
+            foreach($election->get_result_summary() as $key => $v){
+                $data[$count] = $key;
+                $value[$count] = $v;
+                $count++;
+            }
+            array_values($data);
+            array_values($value);
+
+            $barChart = Charts::create('bar', 'highcharts')
+                ->title('Show Result With Bar Chart')
+                ->labels($data)
+                ->values($value)
+                ->responsive(false);
+
+            return $barChart;
+        }
     }
 }

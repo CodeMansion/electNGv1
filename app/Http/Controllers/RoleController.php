@@ -17,6 +17,7 @@ class RoleController extends Controller
         //getting roles and permissions from the database and passing it to the view through $data[];
         $data['roles'] = Role::all();
         $data['permissions'] = Permission::all();
+        
         return view('admin.roles.index')->with($data);
     }
 

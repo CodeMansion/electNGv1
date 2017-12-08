@@ -61,7 +61,7 @@ class UsersController extends Controller
                 $user->user_type_id = $data['user_type_id'];
                 $user->username = $data['username'];
                 $user->email = $data['email'];
-                $user->password = bcrypt('12345678');
+                $user->password = '12345678';
                 $user->activated = 1;
                 $user->user_status_id = 1;
                 $user->save();
