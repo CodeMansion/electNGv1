@@ -22,44 +22,41 @@
 
             <div class="row">
                 <div class="col-12 col-xl-12">
-                    <div class="block block-content content-hold">
-                        @if(count($roles) < 1)
-                            <div class="danger-well">
-                                <em>There are no roles &amps; permissions on this system. Use the button above to assign.</em>
-                            </div>
-                        @else
+                    @if(count($roles) < 1)
+                        <div class="danger-well">
+                            <em>There are no roles and permissions on this system. Use the button above to assign.</em>
+                        </div>
+                    @else
                         <div class="row">
                             @php($index=0) 
                             @foreach($roles as $role)
-                            <div class="card col-lg-4 col-md-4 col-sm-12">
-                                <div class="card-block">
-                                    <div class="block-header">
-                                        <h3 class="card-title">
-                                            {{ strtoupper($role->name) }} <small></small>
-                                        </h3>
-                                    </div>
-                                    <div class="block-content block-content-full">
-                                        <div class="pull-all">
+                                <div class="col-md-6 col-xl-3">
+                                    <div class="block">
+                                        <div class="block-header block-header-default">
+                                            <h3 class="block-title">{{ strtoupper($role->name) }} <i class="fa fa-trash-o create-hover"></i></h3>
+                                        </div>
+                                        <div class="block-content" data-toggle="slimscroll">
                                             <input type="hidden" name="" id="role_id{{$index}}" value="{{ $role->id }}">
                                             @php($check=0)
-                                            @foreach($role->permissions as $permission)
-                                                <div class="form-group" style="display: inline;padding-left: 10px;">
-                                                    <label class="no-margin">
-                                                            <input type="checkbox" name="check" id="check" value="{{$permission->id}}" required="">{{$permission->name}}
-                                                    </label>
-                                                </div>
-                                            @php($check++)
-                                            @endforeach
+                                            <div class="row">
+                                                @foreach($role->permissions as $permission)
+                                                    <div class="col-6">
+                                                        <label>
+                                                                <input type="checkbox" name="check" id="check" value="{{$permission->id}}"> {{$permission->name}}
+                                                        </label>
+                                                    </div>
+                                                @php($check++)
+                                                @endforeach
+                                            </div>
+                                            <hr/><button type="button" class="btn btn-outline-danger btn-sm create-hover" data-delete="{{$role->id}}" id="deleteAssignPermission{{$index}}"><i class="fa fa-close"></i> Remove</button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm create-hover" data-delete="{{$role->id}}" id="deleteAssignPermission{{$index}}"><i class="fa fa-edit"></i> Update</button>
                                         </div>
                                     </div>
-                                    <button type="button" class="btn btn-success create-hover" data-delete="{{$role->id}}" id="deleteAssignPermission{{$index}}"><i class="fa fa-check"></i> remove</button>
                                 </div>
-                            </div>
                             @php($index++)
                             @endforeach
                         </div>
-                        @endif
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

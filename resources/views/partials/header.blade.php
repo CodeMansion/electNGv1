@@ -20,6 +20,7 @@
             <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-rounded btn-dual-secondary create-hover" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @can('view_dashboard')
                 <i class="fa fa-refresh fa-spin ml-5"></i> Quick Links <i class="fa fa-angle-down ml-5"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
@@ -29,8 +30,10 @@
                     <a class="dropdown-item" href="#"><span><i class="si si-note mr-5"></i> Polling Results</span></a>
                     <a class="dropdown-item" href="#"><i class="si si-users mr-5"></i> User Types</a>
                     <a class="dropdown-item" href="#"><i class="si si-lock mr-5"></i> Roles & Permissions</a>
+                    <a class="dropdown-item" href="{{URL::route('preference.uploadView')}}"><i class="si si-cloud-upload mr-5"></i> Bulk Upload</a>
                     <a class="dropdown-item" href="#"><i class="si si-settings mr-5"></i> Preferences</a>
                 </div>
+                @endcan
             </div>
             <!-- END Layout Options -->
         </div>
@@ -44,12 +47,16 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
                     <a class="dropdown-item" href="#"><i class="si si-user mr-5"></i> My Profile</a>
-                    <a class="dropdown-item" href="#"><span><i class="si si-envelope-open mr-5"></i> Elections</span></a>
+                    @can('view_elections')
+                        <a class="dropdown-item" href="#"><span><i class="si si-envelope-open mr-5"></i> Elections</span></a>
+                    @endcan
                     <a class="dropdown-item" href="#"><i class="si si-note mr-5"></i> Reports</a>
                     <div class="dropdown-divider"></div>
+                    @can('view_system_settings')
                     <a class="dropdown-item" href="javascript:void(0)" data-toggle="layout" data-action="side_overlay_toggle">
                         <i class="si si-wrench mr-5"></i> Settings
                     </a>
+                    @endcan
                     <a class="dropdown-item" href="javascript:void(0)" data-toggle="layout" data-action="side_overlay_toggle">
                         <i class="si si-question mr-5"></i> Help
                     </a>
@@ -99,7 +106,5 @@
                 <i class="fa fa-sun-o fa-spin text-white"></i>
             </div>
         </div>
-    </div>
-    <!-- END Header Loader -->
-</header>
-<!-- END Header -->
+    </div><!-- END Header Loader -->
+</header><!-- END Header -->

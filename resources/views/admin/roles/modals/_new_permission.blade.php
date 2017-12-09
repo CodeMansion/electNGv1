@@ -22,11 +22,11 @@
                         <div class="col-sm-12">
                             <div class="form-group row">
                                 <label for="example-text-input">Name <span class="required">*</span></label>
-                                <input type="text" class="form-control form-input" name="pname" placeholder="Name" required>
+                                <input type="text" class="form-control form-input" name="pname" placeholder="Name E.g (delete_users)" required>
                             </div>
                             <div class="form-group row">
                                 <label for="example-text-input">Label <span class="required">*</span></label>
-                                <input type="text" class="form-control form-input" name="plabel" placeholder="Name" required>
+                                <input type="text" class="form-control form-input" name="plabel" placeholder="Label E.g (Delete User)" required>
                             </div>
                         </div> 
                     </div>

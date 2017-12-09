@@ -13,6 +13,7 @@
                                 <button data-toggle="modal" data-target="#new-user" class="btn btn-sm btn-primary create-hover" type="button">Add New</button>
                             </h3><hr/>
                             <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
+                            @include('partials.notifications')
                         </div>
                     </div>
                 </div>
@@ -38,18 +39,23 @@
                                     </td>
                                 </thead>
                                 <tbody>
+                                    @php($index=0)
                                     @foreach($users as $user)
                                         <tr>
                                             <td><input type="checkbox" name="" value=""></td>
                                             <td><img src="{{ asset('images/default.png') }}" width="26" height="26" /></td>
-                                            <td class="user-edit">
+                                            <td class="user-edit{{$index}}">
                                                 <a href="">{{$user['username']}}</a><br/>
-                                                <span id="user-view" style="display:none;color:grey;" style="font-size: 12px;"><a href="#" data-toggle="modal" data-target="#edit-user{{$user['id']}}" ><i class="fa fa-edit"></i> Edit</a> | <a href="#" class="danger" id="delete" data-id="{{$user->id}}"><i class="fa fa-times"></i> delete</a></span>
+                                                <span id="user-view{{$index}}" style="display:none;color:grey;" style="font-size: 12px;">
+                                                    <a href="#" data-toggle="modal" data-target="#edit-user{{$user['id']}}" ><i class="fa fa-edit"></i> Edit</a> | 
+                                                    <a href="#" class="danger" id="delete" data-id="{{$user->id}}"><i class="fa fa-times"></i> delete</a>
+                                                </span>
                                             </td>
                                             <td>{{$user->profile->first_name.' '.$user->profile->last_name}}</td>
                                             <td>{{$user['email']}}</td>
                                             <td>{{$user->roles()->pluck('name')->implode('|')}}</td>
                                         </tr>
+                                    @php($index++)
                                     @endforeach
                                 </tbody>
                             </table>
@@ -64,12 +70,15 @@
 @section('extra_script')
 <script type="text/javascript">
     $(document).ready(function() {
-        $('table.table-condensed tbody tr').on('mouseover',function() {
-            $('#user-view').show();
+        $('table.table-condensed tbody tr').each(function(index) {
+            $(".user-edit"+index).on('mouseover',function() {
+                $('#user-view'+index).show();
+            });
+            $(".user-edit"+index).on('mouseout',function() {
+                $('#user-view'+index).hide();
+            });
         });
-        $('table.table-condensed tbody tr').on('mouseout',function() {
-            $('#user-view').hide();
-        });
+
         $('#submit').on("click",function() {
                 $.LoadingOverlay("show");
                 $.ajax({
