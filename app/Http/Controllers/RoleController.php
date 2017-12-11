@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use App\Role;
 use App\Permission;
 class RoleController extends Controller
@@ -14,6 +15,9 @@ class RoleController extends Controller
      */
     public function index()
     {
+        if (! Gate::allows('view_dashboard')) {
+            return redirect()->route('home');
+        }
         //getting roles and permissions from the database and passing it to the view through $data[];
         $data['roles'] = Role::all();
         $data['permissions'] = Permission::all();

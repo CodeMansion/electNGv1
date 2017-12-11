@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div class="block-content" style="">
-                    <div class="warning-well">
+                    <div class="warning-well" style="margin-bottom: 10px;">
                         <em>Please note that the field marked with asterik (<span class="required">*</span>) are compulsory.</em>
                     </div><hr/>
                     <div class="card card-body">

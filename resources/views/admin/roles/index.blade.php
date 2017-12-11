@@ -30,7 +30,7 @@
                         <div class="row">
                             @php($index=0) 
                             @foreach($roles as $role)
-                                <div class="col-md-6 col-xl-3">
+                                <div class="card col-md-6 col-xl-3">
                                     <div class="block">
                                         <div class="block-header block-header-default">
                                             <h3 class="block-title">{{ strtoupper($role->name) }} <i class="fa fa-trash-o create-hover"></i></h3>
@@ -49,7 +49,7 @@
                                                 @endforeach
                                             </div>
                                             <hr/><button type="button" class="btn btn-outline-danger btn-sm create-hover" data-delete="{{$role->id}}" id="deleteAssignPermission{{$index}}"><i class="fa fa-close"></i> Remove</button>
-                                            <button type="button" class="btn btn-outline-secondary btn-sm create-hover" data-delete="{{$role->id}}" id="deleteAssignPermission{{$index}}"><i class="fa fa-edit"></i> Update</button>
+                                            <!-- <button type="button" class="btn btn-outline-secondary btn-sm create-hover" data-delete="{{$role->id}}" id="deleteAssignPermission{{$index}}"><i class="fa fa-edit"></i> Update</button> -->
                                         </div>
                                     </div>
                                 </div>

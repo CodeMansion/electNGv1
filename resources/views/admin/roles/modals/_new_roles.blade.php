@@ -12,7 +12,7 @@
                     </div>
                 </div>
                 <div class="block-content" style="">
-                    <div class="warning-well">
+                    <div class="warning-well" style="margin-bottom: 10px;">
                         <em>Please note that the field marked with asterik (<span class="required">*</span>) are compulsory.</em>
                     </div>
                     <button class="btn btn-sm btn-primary create-hover add_role" type="button">Add New</button>
@@ -50,7 +50,7 @@
                                     </td>
                                     <td>{{$role->label}}</td>
                                     <td>
-                                        <a href="#" data-toggle="modal" data-target="#edit-roles{{$role['id']}}" ><i class="fa fa-edit"></i></a>
+                                        <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#edit-roles{{$role['id']}}" ><i class="fa fa-edit"></i></a>
                                         <a href="#" class="label label-danger" id="delete" data-id="{{$role->id}}"><i class="fa fa-times"></i></a>
                                     </td>
                                 </tr>
