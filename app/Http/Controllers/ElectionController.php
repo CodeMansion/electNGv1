@@ -13,6 +13,7 @@ use App\Ward;
 use App\PollingStation;
 use App\ElectionResultIndex;
 use App\User;
+use App\ElectionType;
 
 use App\Mail\SendPasscode;
 
@@ -26,6 +27,7 @@ class ElectionController extends Controller
         $data['elections'] = Election::all();
         $data['states'] = State::all();
         $data['politicalParties'] = PoliticalParty::orderBy('code','ASC')->get();
+        $data['electionTypes'] = ElectionType::all();
 
         return view('admin.election.index')->with($data);
     }
@@ -41,108 +43,9 @@ class ElectionController extends Controller
 
         \DB::beginTransaction();
         try {
-            //creating for local selected
-            if($data['type'] == 'lga') {
-                //storing datas
-                $lgas = $data['lga_id'];
-                $parties = $request->get('party');
-                $ElectionCode = strtolower(str_random(4));
-
-                //creating a new election
-                $election = new Election();
-                $election->name = $data['name'];
-                $election->slug = bin2hex(random_bytes(64));
-                $election->description = ($data['description']) ? $data['description'] : null;
-                $election->start_date = date("y-m-d",strtotime($data['start_date']));
-                $election->end_date = date("y-m-d",strtotime($data['end_date']));
-                $election->election_status_id = 1;
-                $election->save();
-
-                // Create a new entry in the assessments index
-		        ElectionResultIndex::insert([
-                    "election_id"=>$election->id, 
-                    "state_id"=>config('constants.ACTIVE_STATE_ID'),
-                    "election_code"=>$ElectionCode
-                ]);
-
-                //creating election parties
-                foreach($parties as $key=>$v){
-                    \DB::table("pivot_election_party")->insert([
-                        'state_id' => config('constants.ACTIVE_STATE_ID'),
-                        'election_id' => $election->id,
-                        'political_party_id' => $v,
-                    ]);
-                }
-
-                //creating election polling units
-                foreach($lgas as $key=>$l){
-                    $C = PollingStation::where('state_id','=',config('constants.ACTIVE_STATE_ID'))->where('lga_id','=',$l)->get();
-                    //looping through each polling units under a local govt area
-                    foreach($C as $c){
-                        \DB::table("pivot_election_polling_units")->insert([
-                            'election_id' => $election->id,
-                            'state_id' => config('constants.ACTIVE_STATE_ID'),
-                            'lga_id' => $l,
-                            'ward_id' => $c->ward_id,
-                            'polling_station_id' => $c->id,
-                            'status' => 1
-                        ]);
-                    }
-                }
-
-                //creating a new table for election results
-                \Schema::create("polling_result_$ElectionCode", function (Blueprint $table) use ($lgas, $parties){			
-                    $table->increments('id');
-                    $table->integer('election_id')->unsigned()->index();
-                    $table->integer('state_id')->unsigned()->index();
-                    $table->integer('lga_id')->unsigned()->index();
-                    $table->integer('ward_id')->unsigned()->index();
-                    $table->integer('polling_station_id')->unsigned()->index();
-                    $table->integer('user_id')->unsigned()->index()->nullable();
-                    $table->integer('accr_voters')->nullable();
-                    $table->integer('void_voters')->nullable();
-                    $table->integer('status');
-                    $table->integer('confirmed_voters')->nullable();
-                    
-                    // create columns based on the number of parties
-                    foreach($parties as $key=>$v){
-                        $party_code = PoliticalParty::find($v);
-                        $p = strtolower($party_code['code']);
-                        $table->string($p);
-                    }
-                    $table->timestamps();
-                });
-
-                // Populate the table with the definition
-                $insertData = [];
-                foreach($lgas as $key=>$l){
-                    $C = PollingStation::where('state_id','=',config('constants.ACTIVE_STATE_ID'))->where('lga_id','=',$l)->get();
-                    foreach($C as $c){
-                        $insertData = [
-                            "election_id"=>$election->id,
-                            "state_id"=>config('constants.ACTIVE_STATE_ID'),
-                            "lga_id"=>$l,
-                            "ward_id"=>$c->ward_id,
-                            "polling_station_id"=>$c->id,
-                            "user_id"=>null,
-                            "accr_voters"=>0,
-                            "void_voters"=>0,
-                            "status"=>1,
-                            "confirmed_voters"=>0
-                        ];
-                        foreach($parties as $key=>$v){
-                            $party_code = PoliticalParty::find($v);
-                            $p = strtolower($party_code['code']);
-                            $insertData[$p] = 0;
-                        }
-
-                        \DB::table("polling_result_$ElectionCode")->insert($insertData);
-                    }
-                }
-                
-                \DB::commit();
-                return redirect()->back()->with("success","Election has been created successfully");
-            }
+            electionTypes((int)$data['type'],$data);
+            \DB::commit();
+            return redirect()->back()->with("success","Election has been created successfully");
         } catch(Exception $e) {
             \DB::rollback();
             return redirect()->back()->with("error","error occured");
@@ -412,59 +315,309 @@ class ElectionController extends Controller
         $data['units'] = Election::find($id,'slug');
         $data['pollingUnits'] = $data['election']->fnPollingUnits()->get();
         $data['politicalParties'] = PoliticalParty::orderBy('code','ASC')->get();
-        $data['pollingResults'] = $data['election']->get_polling_result()->get();
+        $data['pollingResults'] = $data['election']->get_polling_result('state',config('constants.ACTIVE_STATE_ID'))->get();
         $data['approvedPasscodes'] = $data['election']->fnApprovedPasscodes()->get();
-        $data['resultSummary'] = $data['election']->get_result_summary();
-        $data['pieChart'] = $this->displayCharts('pie',$data['election']);
-        $data['barChart'] = $this->displayCharts('bar',$data['election']);
+        $data['resultSummary'] = $data['election']->get_result_summary('state',config('constants.ACTIVE_STATE_ID'));
+
+        //passing charts to the view
+        $data['pieChart'] = $this->displayCharts('pie','state',$data['election'],config('constants.ACTIVE_STATE_ID'));
+        $data['barChart'] = $this->displayCharts('bar','state',$data['election'],config('constants.ACTIVE_STATE_ID'));
+        // $data['areaChart'] = $this->displayCharts('area',$data['election']);
+        // $data['donutChart'] = $this->displayCharts('donut',$data['election']);
         
         return view('admin.election.view-one')->with($data);
     }
 
-    protected function displayCharts($type=null,$election=null)
+    protected function displayCharts($name=null,$level=null,$election=null,
+    $state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$unit_id=null)
     {
-        if($type == 'pie'){
-            $data = [];
-            $value = [];
-            $count = 0;
-            $new = [];
-            foreach($election->get_result_summary() as $key => $v){
-                $data[$count] = $key;
-                $value[$count] = $v;
-                $count++;
+        if($name == 'pie'){
+            if($level == 'state'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('state',$state_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $pieChart = \Charts::create('pie','highcharts')->title('Showing Result With Pie Chart')->labels($data)->values($value)->responsive(false);
+    
+                return $pieChart;
             }
-            array_values($data);
-            array_values($value);
-            
-            $pieChart = \Charts::create('pie', 'highcharts')
-                ->title('Show Result With Pie Chart')
-                ->labels($data)
-                ->values($value)
-                ->responsive(false);
 
-            return $pieChart;
+            if($level == 'constituency'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('constituency',$state_id,$const_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $pieChart = \Charts::create('pie','highcharts')->title('Showing Result With Pie Chart')->labels($data)->values($value)->responsive(false);
+    
+                return $pieChart;
+            }
+
+            if($level == 'local'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('local',$state_id,$lga_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $pieChart = \Charts::create('pie','highcharts')->title('Showing Result With Pie Chart')->labels($data)->values($value)->responsive(false);
+    
+                return $pieChart;
+            }
+
+            if($level == 'ward'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('ward',$state_id,$lga_id,$ward_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $pieChart = \Charts::create('pie','highcharts')->title('Showing Result With Pie Chart')->labels($data)->values($value)->responsive(false);
+    
+                return $pieChart;
+            }
+
+            if($level == 'stations'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('polling-station',$state_id,$lga_id,$ward_id,$unit_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $pieChart = \Charts::create('pie','highcharts')->title('Showing Result With Pie Chart')->labels($data)->values($value)->responsive(false);
+    
+                return $pieChart;
+            }
         }
 
-        if($type == 'bar'){
-            $data = [];
-            $value = [];
-            $count = 0;
-            $new = [];
-            foreach($election->get_result_summary() as $key => $v){
-                $data[$count] = $key;
-                $value[$count] = $v;
-                $count++;
+        //displaying charts result for barchart
+        if($name == 'bar'){
+            if($level == 'state'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('state',$state_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $barChart = Charts::create('bar', 'highcharts')->title('Showing Result With Bar Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $barChart;
             }
-            array_values($data);
-            array_values($value);
 
-            $barChart = Charts::create('bar', 'highcharts')
-                ->title('Show Result With Bar Chart')
-                ->labels($data)
-                ->values($value)
-                ->responsive(false);
+            if($level == 'constituency'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('constituency',$state_id,$const_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $barChart = Charts::create('bar', 'highcharts')->title('Showing Result With Bar Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $barChart;
+            }
 
-            return $barChart;
+            if($level == 'local'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('local',$state_id,$lga_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $barChart = Charts::create('bar', 'highcharts')->title('Showing Result With Bar Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $barChart;
+            }
+
+            if($level == 'ward'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('ward',$state_id,$lga_id,$ward_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $barChart = Charts::create('bar', 'highcharts')->title('Showing Result With Bar Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $barChart;
+            }
+
+            if($level == 'stations'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('polling-station',$state_id,$lga_id,$ward_id,$unit_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $barChart = Charts::create('bar', 'highcharts')->title('Showing Result With Bar Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $barChart;
+            }
+        }
+        
+        if($name == 'donut') {
+            if($level == 'state'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('state',$state_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $donutChart = \Charts::create('donut', 'highcharts')->title('Showing Result With Donut Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $donutChart;
+            }
+
+            if($level == 'constituency'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('constituency',$state_id,$const_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $donutChart = \Charts::create('donut', 'highcharts')->title('Showing Result With Donut Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $donutChart;
+            }
+
+            if($level == 'local'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('local',$state_id,$lga_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $donutChart = \Charts::create('donut', 'highcharts')->title('Showing Result With Donut Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $donutChart;
+            }
+
+            if($level == 'ward'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('ward',$state_id,$lga_id,$ward_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $donutChart = \Charts::create('donut', 'highcharts')->title('Showing Result With Donut Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $donutChart;
+            }
+
+            if($level == 'stations'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('polling-station',$state_id,$lga_id,$ward_id,$unit_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $donutChart = \Charts::create('donut', 'highcharts')->title('Showing Result With Donut Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $donutChart;
+            }
+        }
+
+        if($name == 'area') {
+            if($level == 'state'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('state',$state_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                
+                return $areaChart;
+            }
+
+            if($level == 'constituency'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('constituency',$state_id,$const_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                
+                return $areaChart;
+            }
+
+            if($level == 'local'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('local',$state_id,$lga_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                
+                return $areaChart;
+            }
+
+            if($level == 'ward'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('ward',$state_id,$lga_id,$ward_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                
+                return $areaChart;
+            }
+
+            if($level == 'stations'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('polling-station',$state_id,$lga_id,$ward_id,$unit_id);
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                
+                return $areaChart;
+            }
         }
     }
 }

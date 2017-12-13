@@ -17,8 +17,7 @@ class CreateLgasTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('state_id')->unsigned();
-
-            $table->foreign('state_id')->references('id')->on('states');
+            $table->integer('constituency_id')->unsigned()->nullable();
             $table->timestamps();
         });
     }

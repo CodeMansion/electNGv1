@@ -17,6 +17,7 @@ class CreateWardsTable extends Migration
             $table->increments('id');
             $table->text('slug', 191);
             $table->integer('state_id')->unsigned()->index();
+            $table->integer('constituency_id')->unsigned()->index();
             $table->integer('lga_id')->unsigned()->index();
             $table->string('name');
             $table->string('code');

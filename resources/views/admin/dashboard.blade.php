@@ -64,7 +64,7 @@
     <!-- end of polling unit officials permission -->
 
     <!-- permissions set for admins and super admin -->
-    @can('view_dashboard')
+    
         <div class="row ">
             <div class="col-12" style="margin-bottom:10px;">
                 @include('partials.notifications')
@@ -136,7 +136,7 @@
                 </div>
                 <!-- END Row #1 -->
             </div>
-        @endcan
+       
     </div><!-- END Row #5 -->
 </div><!-- END Page Content -->
 </main><!-- END Main Container -->

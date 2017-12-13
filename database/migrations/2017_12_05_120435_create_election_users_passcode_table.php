@@ -17,6 +17,7 @@ class CreateElectionUsersPasscodeTable extends Migration
             $table->increments('id');
             $table->integer('election_id');
             $table->integer('state_id');
+            $table->integer('constituency_id')->unsigned()->index()->nullable();
             $table->integer('lga_id');
             $table->integer('ward_id');
             $table->integer('polling_station_id')->unsigned()->index();
