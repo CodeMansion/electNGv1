@@ -181,6 +181,7 @@ return [
 
         Favoriabs\NgStateLga\NgStateLgaServiceProvider::class,
         ConsoleTVs\Charts\ChartsServiceProvider::class,
+        EllipseSynergie\ApiResponse\Laravel\ResponseServiceProvider::class,
 
     ],
 

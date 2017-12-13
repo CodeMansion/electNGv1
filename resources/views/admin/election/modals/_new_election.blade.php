@@ -54,16 +54,12 @@
                                     <label for="example-text-input">Type of Election <span class="required">*</span></label>
                                     <select name="type" class="form-control">
                                         <option value="">--select election type--</option>
-                                        <!-- <option value="national">National</option> -->
-                                        <option value="state">State</option>
-                                        <option value="lga">Local Govt. Area</option>
+                                        @foreach($electionTypes as $type)
+                                            <option value="{{$type['id']}}">{{$type['name']}}</option>
+                                        @endforeach
                                     </select>
                                     <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
                                 </div>
-                                <div class="col-md-6" id="view-lga">
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <div class="col-md-6" id="view-parties">
                                     <label for="example-text-input">Select Parties <span class="required">*</span></label>
                                     <select class="js-select2 form-control" id="example2-select2" name="party[]" style="width: 100%;" data-placeholder="Choose many.." multiple>
@@ -75,6 +71,11 @@
                                     <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
                                 </div>
                             </div>
+                            <div class="form-group row">
+                                <div class="col-md-6" id="view-lga">
+                                
+                                </div>
+                            </div>
                         </div> 
                     </div>
                 </div>
@@ -83,7 +84,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-alt-secondary create-hover" data-dismiss="modal">Close</button>
                 @if(config('constants.ACTIVE_STATE_ID'))
-                <button type="submit" class="btn btn-success create-hover"><i class="fa fa-check"></i> Submit</button>
+                <button type="submit" id="submit-election" class="btn btn-success create-hover"><i class="fa fa-check"></i> Submit</button>
                 @endif
             </div>
             </form>

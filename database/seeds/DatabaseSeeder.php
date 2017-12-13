@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         $this->call(StateLgasTableSeeder::class);
         $this->call(PoliticalPartyTableSeeder::class);
         $this->call(ElectionStatusTableSeeder::class);
+        $this->call(ElectionTypeTableSeeder::class);
     }
 }

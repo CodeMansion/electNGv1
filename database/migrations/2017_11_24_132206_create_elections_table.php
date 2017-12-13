@@ -21,6 +21,7 @@ class CreateElectionsTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('election_status_id')->unsigned()->index()->default(1);
+            $table->integer('election_type_id')->unsigned();
             $table->string('remarks')->nullable();
             $table->timestamps();
         });

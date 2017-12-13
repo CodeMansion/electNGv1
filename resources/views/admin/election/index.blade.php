@@ -16,9 +16,8 @@
                         <div class="col-md-12">
                             <h3 style="margin-bottom:5px;">
                                 <i class="si si-feed"></i> Elections 
-                                @can('add_elections')
-                                    <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button"> Add Election</button>
-                                @endcan
+                                <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button"> Add Election</button>
+                               
                                 <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
                             </h3><hr/>
                             <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
@@ -76,7 +75,7 @@
             $("#view-parties").hide();
 
             $("select[name=type]").on("change", function(){
-                if($("select[name=type]").val() == 'lga') {
+                if($("select[name=type]").val() == '4') {
                     $.LoadingOverlay("show");
                     $.ajax({
                         url: "{{URL::route('ElectionAjax')}}",

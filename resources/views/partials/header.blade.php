@@ -20,7 +20,7 @@
             <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-rounded btn-dual-secondary create-hover" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @can('view_dashboard')
+                
                 <i class="fa fa-refresh fa-spin ml-5"></i> Quick Links <i class="fa fa-angle-down ml-5"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
@@ -33,7 +33,7 @@
                     <a class="dropdown-item" href="{{URL::route('preference.uploadView')}}"><i class="si si-cloud-upload mr-5"></i> Bulk Upload</a>
                     <a class="dropdown-item" href="#"><i class="si si-settings mr-5"></i> Preferences</a>
                 </div>
-                @endcan
+                
             </div>
             <!-- END Layout Options -->
         </div>
