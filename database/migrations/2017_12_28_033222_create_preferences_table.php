@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateElectionUsersPasscodeTable extends Migration
+class CreatePreferencesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateElectionUsersPasscodeTable extends Migration
      */
     public function up()
     {
-        Schema::create('election_candidates', function (Blueprint $table) {
+        Schema::create('preferences', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('election_id')->unsigned()->index();
-            $table->integer('state_id')->unsigned()->index()->nullable();
-            $table->integer('user_id')->unsigned()->index();
-            $table->integer('status')->default(1);
+            $table->integer('page_refresh');
+            $table->integer('page_refresh_interval');
+            $table->integer('sound_notification');
+            $table->integer('party_counter');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateElectionUsersPasscodeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('election_candidates');
+        Schema::dropIfExists('preferences');
     }
 }

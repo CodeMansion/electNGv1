@@ -10,18 +10,18 @@
     <main id="main-container">
         <!-- Page Content -->
         <div class="content">
+        @include('partials.notifications')
             <div class="row" style="">
                 <div class="col-12 col-xl-12">
                     <div class="block block-content title-hold">
                         <div class="col-md-12">
                             <h3 style="margin-bottom:5px;">
                                 <i class="si si-feed"></i> Elections 
+                                @can('super_admin')
                                 <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button"> Add Election</button>
-                               
+                                @endcan
                                 <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
                             </h3><hr/>
-                            <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
-                            @include('partials.notifications')
                         </div>
                     </div>
                 </div>
@@ -71,33 +71,109 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#view-lga").hide();
             $("#view-parties").hide();
+            $("#view-states").hide();
+            $("#lga").hide();
+            $("#const").hide();
 
-            $("select[name=type]").on("change", function(){
-                if($("select[name=type]").val() == '4') {
-                    $.LoadingOverlay("show");
-                    $.ajax({
-                        url: "{{URL::route('ElectionAjax')}}",
-                        method: "POST",
-                        data:{
-                            '_token': "{{csrf_token()}}",
-                            'req': "viewLga"
-                        },
-                        success: function(data){
-                            $("#view-lga").show();
-                            $.LoadingOverlay("hide");
-                            $("#view-lga").html(data);
-                            $("#view-parties").show();
-                        },
-                        error: function(rst){
-                            $.LoadingOverlay("hide");
-                            swal("Oops! Error","An Error Occured!", "error");
-                        }
-                    });
-                } else {
-                    $("#view-state").hide();
+            $("select[name=type]").on("change", function() {
+                if($(this).val() == '1') {
+                    $("#view-parties").hide();
+                    $("#view-states").hide();
+                    $("#lga").hide();
+                    $("#const").hide();
+
+                    $("#view-parties").show();
                 }
+
+                if($(this).val() == '2') {
+                    $("#view-parties").hide();
+                    $("#view-states").hide();
+                    $("#lga").hide();
+                    $("#const").hide();
+                    
+                    $("#view-states").show();
+                    $("#view-parties").show();
+                }
+
+                if($(this).val() == '3') {
+                    $("#view-parties").hide();
+                    $("#view-states").hide();
+                    $("#lga").hide();
+                    $("#const").hide();
+
+                    $("#view-states").show();
+                    $("#const").show();
+                    $("#view-parties").show();
+                }
+
+                if($(this).val() == '4') {
+                    $("#view-states").hide();
+                    $("#lga").hide();
+                    $("#const").hide();
+
+                    $("#view-parties").show();
+                    $("#view-states").show();
+                    $("#lga").show();
+                    $("#const").show();
+                }
+
+                if($(this).val() == '') {
+                    $("#view-parties").hide();
+                    $("#view-states").hide();
+                    $("#lga").hide();
+                    $("#const").hide();
+                }
+            });
+
+            $("select[name=state_id]").on("change", function() {
+                var state_id = $(this).val();
+                $.ajax({
+                    url: "{{URL::route('ElectionAjax')}}",
+                    method: "POST",
+                    data:{
+                        '_token': "{{csrf_token()}}",
+                        'state_id': state_id,
+                        'req': "viewConst"
+                    },
+                    success: function(data){
+                        $("#view-const").html(data);
+                    },
+                    error: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Oops! Error","An Error Occured!", "error");
+                    }
+                });
+            });
+
+            $("select[name=constituency_id]").on("change", function() {
+                var constituency_id = $(this).val();
+                var state_id = $("select[name=state_id]").val();
+                $.ajax({
+                    url: "{{URL::route('ElectionAjax')}}",
+                    method: "POST",
+                    data:{
+                        '_token': "{{csrf_token()}}",
+                        'constituency_id': constituency_id,
+                        'state_id': state_id,
+                        'req': "viewLga"
+                    },
+                    success: function(data){
+                        $("#view-lga").html(data);
+                    },
+                    error: function(rst){
+                        $.LoadingOverlay("hide");
+                        swal("Oops! Error","An Error Occured!", "error");
+                    }
+                });
+            });
+
+            $("#submit-election").on("click", function() {
+                $.LoadingOverlay("show");
+            });
+
+            $("select[name=lga_id]").on("change", function() {
+                $("#view-parties").show();
             });
         });    
     </script>

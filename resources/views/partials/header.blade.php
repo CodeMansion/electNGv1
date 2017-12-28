@@ -2,42 +2,30 @@
 <header id="page-header">
     <div class="content-header">
         <div class="content-header-section">
-            <!-- Toggle Sidebar
-            <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
             <button type="button" class="btn btn-circle btn-dual-secondary" data-toggle="layout" data-action="sidebar_toggle">
                 <i class="fa fa-navicon"></i>
             </button>
-            <!-- END Toggle Sidebar -->
-
-            <!-- Open Search Section -->
-            <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
             <button type="button" class="btn btn-circle btn-dual-secondary" data-toggle="layout" data-action="header_search_on">
                 <i class="fa fa-search"></i>
             </button>
-            <!-- END Open Search Section -->
-
-            <!-- Layout Options (used just for demonstration) -->
-            <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-rounded btn-dual-secondary create-hover" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                
+                @can('super_admin')
                 <i class="fa fa-refresh fa-spin ml-5"></i> Quick Links <i class="fa fa-angle-down ml-5"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
                     <a class="dropdown-item" href="{{URL::route('Election.View')}}"><i class="si si-note mr-5"></i> View Elections</a>
-                    <a class="dropdown-item" href="{{URL::route('Users.View')}}"><span><i class="si si-user"></i> Create User</span></a>
+                    <a class="dropdown-item" href="{{URL::route('Users.View')}}"><span><i class="si si-user"></i> User</span></a>
                     <a class="dropdown-item" href="{{URL::route('PP.View')}}"><span><i class="si si-book-open mr-5"></i> Political Parties</span></a>
-                    <a class="dropdown-item" href="#"><span><i class="si si-note mr-5"></i> Polling Results</span></a>
-                    <a class="dropdown-item" href="#"><i class="si si-users mr-5"></i> User Types</a>
-                    <a class="dropdown-item" href="#"><i class="si si-lock mr-5"></i> Roles & Permissions</a>
+                    <a class="dropdown-item" href="{{URL::route('State.View')}}"><span><i class="si si-note mr-5"></i> States & Local Govt</span></a>
+                    <a class="dropdown-item" href="{{URL::route('ward.index')}}"><i class="si si-users mr-5"></i> Wards & Polling Units</a>
+                    <a class="dropdown-item" href="{{URL::route('roles.index')}}"><i class="si si-lock mr-5"></i> Roles & Permissions</a>
                     <a class="dropdown-item" href="{{URL::route('preference.uploadView')}}"><i class="si si-cloud-upload mr-5"></i> Bulk Upload</a>
-                    <a class="dropdown-item" href="#"><i class="si si-settings mr-5"></i> Preferences</a>
+                    <a class="dropdown-item" href="{{URL::route('preference.index')}}"><i class="si si-settings mr-5"></i> Preferences</a>
                 </div>
-                
+                @endcan
             </div>
-            <!-- END Layout Options -->
         </div>
-        <!-- END Left Section -->
 
         <!-- Right Section -->
         <div class="content-header-section">
@@ -47,15 +35,13 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
                     <a class="dropdown-item" href="#"><i class="si si-user mr-5"></i> My Profile</a>
-                    @can('view_elections')
+                    @can('super_admin')
                         <a class="dropdown-item" href="#"><span><i class="si si-envelope-open mr-5"></i> Elections</span></a>
-                    @endcan
-                    <a class="dropdown-item" href="#"><i class="si si-note mr-5"></i> Reports</a>
-                    <div class="dropdown-divider"></div>
-                    @can('view_system_settings')
-                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="layout" data-action="side_overlay_toggle">
-                        <i class="si si-wrench mr-5"></i> Settings
-                    </a>
+                        <a class="dropdown-item" href="#"><i class="si si-note mr-5"></i> Reports</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{URL::route('preference.index')}}" data-toggle="layout" data-action="side_overlay_toggle">
+                            <i class="si si-wrench mr-5"></i> Settings
+                        </a>
                     @endcan
                     <a class="dropdown-item" href="javascript:void(0)" data-toggle="layout" data-action="side_overlay_toggle">
                         <i class="si si-question mr-5"></i> Help
@@ -64,10 +50,7 @@
                     <a class="dropdown-item" href="{{ url('logout') }}"><i class="si si-logout mr-5"></i> Sign Out</a>
                 </div>
             </div>
-            <!-- END User Dropdown -->
-
-            <!-- Toggle Side Overlay -->
-            <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
+            
             <button type="button" class="btn btn-circle btn-dual-secondary" data-toggle="layout" data-action="side_overlay_toggle">
                 <i class="fa fa-tasks"></i>
             </button>
@@ -81,12 +64,9 @@
             <form action="be_pages_generic_search.html" method="post">
                 <div class="input-group">
                     <span class="input-group-btn">
-                        <!-- Close Search Section -->
-                        <!-- Layout API, functionality initialized in Codebase() -> uiApiLayout() -->
                         <button type="button" class="btn btn-secondary" data-toggle="layout" data-action="header_search_off">
                             <i class="fa fa-times"></i>
                         </button>
-                        <!-- END Close Search Section -->
                     </span>
                     <input type="text" class="form-control" placeholder="Search or hit ESC.." id="page-header-search-input" name="page-header-search-input">
                     <span class="input-group-btn">

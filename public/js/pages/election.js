@@ -4,6 +4,8 @@ $(document).ready(function() {
     $("#polling-details").hide();
     $("#has-error").hide();
     $("#refresh").hide();
+
+    page_refresh_stats();
     
     //assigning a user to a polling centre under a state
     $("#modal .modal").each(function(index){
@@ -111,4 +113,4 @@ $(document).ready(function() {
         $("input[name=passcode]").attr('disabled',false);
         $("input[name=passcode]").val('');
     });
-});    
+}); 

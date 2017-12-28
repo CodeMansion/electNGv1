@@ -23,10 +23,6 @@ class RolesTableSeeder extends Seeder
             [
 		        'name' => 'Candidate',
 		        'label' => 'Candidate Access',
-            ],
-            [
-		        'name' => 'Polling Officer',
-		        'label' => 'Polling Officer Access',
             ]
         ]);
     }
