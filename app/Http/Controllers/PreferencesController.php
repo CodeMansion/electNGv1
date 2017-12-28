@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Preference;
+
 class PreferencesController extends Controller
 {
     /**
@@ -13,7 +15,9 @@ class PreferencesController extends Controller
      */
     public function index()
     {
-        return view('admin.bulk-upload.index');
+        $data['settings'] = Preference::find(1);
+
+        return view('admin.preferences..index')->with($data);
     }
 
     public function bulkUploadIndex()
@@ -26,13 +30,14 @@ class PreferencesController extends Controller
         if($request->hasFile('file')){
             
              try {
-                 ini_set('max_execution_time', 300);
+                //  ini_set('max_execution_time', 800);
                  $time_start = microtime(true);
                  
                  bulkUpload($request->get('upload-type'),$request->file('file'));
  
                  $time_end = microtime(true);
                  $execution_time = ($time_end - $time_start)/60;
+
                  return redirect()->back()->with('success',"Upload Completed successfully in $execution_time Mins");
  
              } catch(Exception $e) {
@@ -60,7 +65,23 @@ class PreferencesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+        \DB::beginTransaction();
+        try {
+            $update = \DB::table("preferences")->where("id","=",1)->update([
+                'page_refresh' => (int)$data['page_refresh'],
+                'sound_notification' => (int)$data['sound'],
+                'party_counter' => (int)$data['party_counter'],
+                'page_refresh_interval' => (int)$data['interval']
+            ]);
+
+            \DB::commit();
+            return redirect()->back()->with("success","Settings updated successfully.");
+
+        } catch(Exception $e) {
+            \DB::rollback();
+            return redirect()->back()->with("error",$e->getMessage());
+        }
     }
 
     /**

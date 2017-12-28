@@ -33,6 +33,7 @@
                             <select class="form-control" name="upload-type" required>
                                 <option value="">--select table to upload--</option>
                                 <option value="state">State</option>
+                                <option value="constituency">Constituency</option>
                                 <option value="ward">Ward</option>
                                 <option value="lga">Local Govt. Areas</option>
                                 <option value="polling-centres">Polling Centres</option>

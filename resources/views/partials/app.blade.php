@@ -15,7 +15,7 @@
         @yield('extra_style')
     </head>
     <body>
-        <div id="page-container" class="sidebar-o sidebar-mini sidebar-inverse side-scroll side-scroll page-header-fixed page-header-inverse">
+        <div id="page-container" class=" sidebar-mini sidebar-inverse side-scroll side-scroll page-header-fixed page-header-inverse">
             <!-- top menu content -->
             <!--  -->
             <!-- side menu content -->

@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 Route::group(['prefix' => 'v1'], function() {
 	//api route for check/validating election token
 	Route::post('login', 'API\CheckElectionController@store');
+	Route::post('election-details', 'API\SubmitResultController@index');
+	Route::post('parties', 'API\CheckElectionController@getParties');
 
 	//api route for submit election result
 	Route::get('election-types', 'API\SubmitResultController@index');
@@ -23,7 +25,7 @@ Route::group(['prefix' => 'v1'], function() {
 	Route::post('lga', 'API\SubmitResultController@viewLga');
 	Route::post('ward', 'API\SubmitResultController@viewWard');
 	Route::post('polling-centres', 'API\SubmitResultController@viewCentres');
-	Route::post('results', 'API\SubmitResultController@store');
+	Route::post('submit-result', 'API\SubmitResultController@store');
 });
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {

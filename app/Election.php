@@ -37,40 +37,8 @@ class Election extends Model
         return self::where('id', '=', $id)->firstOrFail();
     }
 
-    public function centre($id){
-        $centre = PollingStation::find($id);
-        return $centre['name'];
-        // return $this->belongsTo('App\PollingStation','polling_station_id','id');
-    }
-
-    public function lga($id){
-        $lga = Lga::find($id);
-        return $lga['name'];
-    }
-
-    public function ward($id){
-        $ward = Ward::find($id);
-        return $ward['name'];
-    }
-
-    public function state($id){
-        $state = State::find($id);
-        return strtoupper($state['name']);
-    }
-
-    public function pollingUsers($id) {
-        $user = User::find($id);
-        return strtoupper($user->profile->first_name.' '.$user->profile->last_name);
-    }
-
-    public function pollingCentres($id) {
-        $centre = PollingStation::find($id);
-        return strtoupper($centre['name']);
-    }
-
     public function fnAssignParties(){
         return $this->belongsToMany('App\PoliticalParty', 'pivot_election_party')
-                ->where("state_id", "=", config('constants.ACTIVE_STATE_ID'))
                 ->orderBy("code")
                 ->select(["political_parties.*"]);
     }
@@ -85,7 +53,7 @@ class Election extends Model
 
     public function fnPollingUnits(){
         $polling_list = \DB::table("pivot_election_polling_units")
-                ->where("pivot_election_polling_units.state_id", "=", config('constants.ACTIVE_STATE_ID'))
+                // ->where("pivot_election_polling_units.state_id","=",1)
                 ->where("pivot_election_polling_units.election_id", "=", $this->id);
 
         return $polling_list;
@@ -107,9 +75,10 @@ class Election extends Model
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
             $result = \DB::table("polling_result_$code")
+                            ->where("election_id","=",$this->id)
                             ->where("state_id","=",$state_id)
-                            ->where("lga_id","=",$lga_id)
-                            ->where("election_id","=",$this->id);
+                            ->where("constituency_id","=",$const_id)
+                            ->where("lga_id","=",$lga_id);  
             
             return $result;
         }
@@ -130,6 +99,7 @@ class Election extends Model
             $code = $ElectionCode['election_code'];
             $result = \DB::table("polling_result_$code")
                             ->where("state_id","=",$state_id)
+                            ->where("constituency_id","=",$const_id)
                             ->where("lga_id","=",$lga_id)
                             ->where("ward_id","=",$ward_id)
                             ->where("election_id","=",$this->id);
@@ -144,7 +114,7 @@ class Election extends Model
                             ->where("state_id","=",$state_id)
                             ->where("lga_id","=",$lga_id)
                             ->where("ward_id","=",$ward_id)
-                            ->where("polling_unit_id","=",$unit_id)
+                            ->where("polling_station_id","=",$unit_id)
                             ->where("election_id","=",$this->id);
             
             return $result;
@@ -182,7 +152,7 @@ class Election extends Model
         
         //querying result based on constituency level
         if($type == 'constituency'){
-            $result = $this->get_polling_result('constituency',$const_id)->get();
+            $result = $this->get_polling_result('constituency',$state_id,$const_id)->get();
 
             //looping through the result to able to calculate total for each parties 
             //under this election
@@ -197,7 +167,7 @@ class Election extends Model
         
         //querying result based on local govt level
         if($type == 'local'){
-            $result = $this->get_polling_result('local',$state_id,$lga_id)->get();
+            $result = $this->get_polling_result('local',$state_id,$const_id,$lga_id)->get();
 
             //looping through the result to able to calculate total for each parties 
             //under this election
@@ -212,7 +182,7 @@ class Election extends Model
 
         //querying result based on ward level
         if($type == 'ward'){
-            $result = $this->get_polling_result('ward',$state_id,$lga_id,$ward_id)->get();
+            $result = $this->get_polling_result('ward',$state_id,$const_id,$lga_id,$ward_id)->get();
 
             //looping through the result to able to calculate total for each parties 
             //under this election

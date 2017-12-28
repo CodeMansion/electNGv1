@@ -21,10 +21,14 @@ Route::group(['middleware'=>['auth']], function(){
         // Route::get('/add-election', array('as'=>'ElectionNew','uses'=>'ElectionController@indexNew'));
         Route::post('/create-election', array('as'=>'Election.New','uses'=>'ElectionController@store'));
         Route::get('/election-view/{id?}', array('as'=>'Election.ViewOne','uses'=>'ElectionController@view'));
+        Route::get('/submitted-result/{id?}', array('as'=>'SubmittedResult','uses'=>'ElectionController@viewSubmittedResult'));
+        Route::get('/passcode-view/{id?}', array('as'=>'PasscodeView','uses'=>'ElectionController@passcodeView'));
         Route::post('/ajax-calls', array('as'=>'ElectionAjax','uses'=>'ElectionController@AjaxProcess'));
         Route::post('/change-status', array('as'=>'Election.ChangeStatus','uses'=>'ElectionController@changeStatus'));
         Route::post('/check-passcode', array('as'=>'CheckPasscode','uses'=>'ElectionController@checkPasscode'));
         Route::put('/submit-result', array('as'=>'SubmitResult','uses'=>'ElectionController@submitResult'));
+        Route::post('dashboard-stats', array('as'=>'Election.Stats','uses'=>'ElectionController@showStats'));
+        Route::post('query-api', array('as'=>'QueryApi','uses'=>'ElectionController@queryResult'));
     });
 
     //-- STATES ROUTES --//
@@ -80,7 +84,9 @@ Route::group(['middleware'=>['auth']], function(){
     //-- SETTINGS & PREFERENCES ROUTES --//
     Route::group(['prefix' => 'preferences'], function () {
         Route::get('/', array('as'=>'preference.uploadView','uses'=>'PreferencesController@bulkUploadindex'));
+        Route::get('/preferences', array('as'=>'preference.index','uses'=>'PreferencesController@index'));
         Route::post('/bulk-upload', array('as'=>'preference.uploadStore','uses'=>'PreferencesController@storeBulkUpload'));
+        Route::post('/preferences', array('as'=>'preference.Store','uses'=>'PreferencesController@store'));
     });
 });
 

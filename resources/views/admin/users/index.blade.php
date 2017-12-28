@@ -12,7 +12,7 @@
                                 <i class="si si-users"></i> Users 
                                 <button data-toggle="modal" data-target="#new-user" class="btn btn-sm btn-primary create-hover" type="button">Add New</button>
                             </h3><hr/>
-                            <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
+                            <p><a href="{{URL::route('Election.View')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
                             @include('partials.notifications')
                         </div>
                     </div>

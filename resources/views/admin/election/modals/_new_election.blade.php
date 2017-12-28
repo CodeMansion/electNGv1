@@ -60,7 +60,33 @@
                                     </select>
                                     <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
                                 </div>
-                                <div class="col-md-6" id="view-parties">
+                                <div class="col-md-6" id="view-states" style="display: none;">
+                                    <label for="example-text-input">Select States <span class="required">*</span></label>
+                                    <select class="form-control" name="state_id" style="width: 100%;">
+                                        <option value="">--select state--</option>
+                                        @foreach($states as $state)
+                                            <option value="{{$state['id']}}">{{strtoupper($state['name'])}}</option>
+                                        @endforeach
+                                    </select>
+                                    <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6" id="const" style="display: none;">
+                                    <label for="example-select2-multiple">Select Constituency <span class="required">*</span></label>
+                                    <select class="form-control" name="constituency_id" id="view-const">
+                                    </select>
+                                    <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
+                                </div>
+                                <div class="col-md-6" id="lga" style="display: none;">
+                                    <label for="example-select2-multiple">Select LGA<span class="required">*</span></label>
+                                    <select class="form-control" name="lga_id" style="width: 100%;" id="view-lga">
+                                    </select>
+                                    <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
+                                </div>
+                            </div>
+                            <div class="form-group row" id="view-parties" style="display: none;">
+                                <div class="col-md-6">
                                     <label for="example-text-input">Select Parties <span class="required">*</span></label>
                                     <select class="js-select2 form-control" id="example2-select2" name="party[]" style="width: 100%;" data-placeholder="Choose many.." multiple>
                                         <option value="">--select political parties--</option>
@@ -71,11 +97,6 @@
                                     <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <div class="col-md-6" id="view-lga">
-                                
-                                </div>
-                            </div>
                         </div> 
                     </div>
                 </div>
@@ -83,9 +104,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-alt-secondary create-hover" data-dismiss="modal">Close</button>
-                @if(config('constants.ACTIVE_STATE_ID'))
                 <button type="submit" id="submit-election" class="btn btn-success create-hover"><i class="fa fa-check"></i> Submit</button>
-                @endif
             </div>
             </form>
         </div>
