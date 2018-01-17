@@ -12,11 +12,6 @@
                     </div>
                 </div>
                 <div class="block-content">
-                @if(!config('constants.ACTIVE_STATE_NAME'))
-                    <div class="danger-well">
-                        <em>You cannot add election at this time. No state is active. Activate a state here <a href="">Here</a></em>
-                    </div>
-                @else
                     <div class="info-well">
                         <em>Please follow the instructions and fill the form carefully. Note that fields make with asterisk (<span class="required">*</span>) are compulsory.</em>
                     </div><hr/>
@@ -81,6 +76,7 @@
                                 <div class="col-md-6" id="lga" style="display: none;">
                                     <label for="example-select2-multiple">Select LGA<span class="required">*</span></label>
                                     <select class="form-control" name="lga_id" style="width: 100%;" id="view-lga">
+                                        <option value="0">-- --</option>
                                     </select>
                                     <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
                                 </div>
@@ -100,7 +96,6 @@
                         </div> 
                     </div>
                 </div>
-                @endif
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-alt-secondary create-hover" data-dismiss="modal">Close</button>

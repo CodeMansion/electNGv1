@@ -9,21 +9,21 @@
 @section('content')
     <main id="main-container">
         <!-- Page Content -->
-        <div class="content">
+        <div class="content container">
         @include('partials.notifications')
             <div class="row" style="">
-                <div class="col-12 col-xl-12">
-                    <div class="block block-content title-hold">
-                        <div class="col-md-12">
-                            <h3 style="margin-bottom:5px;">
-                                <i class="si si-feed"></i> Elections 
-                                @can('super_admin')
-                                <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button"> Add Election</button>
-                                @endcan
-                                <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
-                            </h3><hr/>
-                        </div>
-                    </div>
+                <div class="block block-content title-hold">
+                    <div class="col-md-12">
+                        <h3 style="margin-bottom:5px;">
+                            <i class="si si-feed"></i> Elections 
+                            @can('super_admin')
+                            <button data-toggle="modal" data-target="#new-election" class="btn btn-sm btn-primary create-hover" type="button"> Add Election</button>
+                            @endcan
+                        </h3>
+                    </div><br/>
+                    @can('super_admin')
+                        <a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a> 
+                    @endcan
                 </div>
             </div>
 
@@ -39,9 +39,6 @@
                                 <div class="col-md-6 col-xl-3">
                                     <a class="block block-link-shadow election-hold" href="{{URL::route('Election.ViewOne',$election['slug'])}}" data-toggle="tooltip" title="View This Election">
                                         <div class="block-content block-content-full clearfix">
-                                            <div class="float-right">
-                                                <img class="img-avatar" src="{{ asset('/images/avatar6.jpg') }}" alt="">
-                                            </div>
                                             <div class="float-left mt-9">
                                                 <div class="font-w600 mb-3" style="font-size:20px;">
                                                     <span data-toggle="tooltip" title="{{$election['description']}}"><strong>{{$election['name']}}</strong></span>
@@ -51,7 +48,7 @@
                                                 </div>
                                             </div>
                                             <div class="clearfix"></div><hr/>
-                                            <p>Status: <span class="badge badge-{{$election->status->class}}"><i class="fa fa-cog mr-5"></i> {{$election->status->name}}</span></p>
+                                            <p>Status: <span class="badge badge-{{$election->status->class}}"> {{$election->status->name}}</span></p>
                                         </div>
                                     </a>
                                 </div>

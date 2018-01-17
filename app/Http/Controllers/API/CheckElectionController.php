@@ -42,55 +42,59 @@ class CheckElectionController extends Controller
      */
     public function store(Request $request)
     {
-        if(ElectionOnetimePassword::isvalid($request->get('otp'))){
-            $id = ElectionOnetimePassword::where("otp","=",$request->get('otp'))->first();
-            $param['election'] = Election::find($id->election_id);
-            $party = [];
+        try {
+            if(ElectionOnetimePassword::isvalid($request->get('otp'))){
+                $id = ElectionOnetimePassword::where("otp","=",$request->get('otp'))->first();
+                $param['election'] = Election::find($id->election_id);
+                $party = [];
 
-            //getting the the election index code
-            $IndexCode = ElectionResultIndex::where('election_id','=',$id->election_id)
-                    ->where('state_id','=',$id->state_id)->first();
-            $IC = $IndexCode['election_code'];
+                //getting the election index code
+                $IndexCode = ElectionResultIndex::where('election_id','=',$id->election_id)->first();
+                $IC = $IndexCode['election_code'];
 
-            //query the election result table
-            $resultInfo = \DB::table("polling_result_$IC")
-                    ->where('election_id','=',$id->election_id)
-                    ->where('state_id','=',$id->state_id)
-                    // ->where('constituency_id','=',$id->constituency_id)
-                    ->where('lga_id','=',$id->lga_id)
-                    ->where('ward_id','=',$id->ward_id)
-                    ->where('polling_station_id','=',$id->polling_unit_id)
-                    ->first();
+                //query the election result table
+                $resultInfo = \DB::table("polling_".$IC."_results")
+                        ->where('election_id','=',$id->election_id)
+                        ->where('state_id','=',$id->state_id)
+                        // ->where('constituency_id','=',$id->constituency_id)
+                        ->where('lga_id','=',$id->lga_id)
+                        ->where('ward_id','=',$id->ward_id)
+                        ->where('polling_station_id','=',$id->polling_unit_id)
+                        ->first();
 
-            $parties = \DB::table("pivot_election_party")
-                    ->where('election_id','=',$id->election_id)
-                    ->where('state_id','=',$id->state_id)->get();
+                //querying registered political parties
+                $parties = \DB::table("pivot_election_parties")->where('election_id','=',$id->election_id)->get();
 
-            foreach($parties as $key=>$v){
-                $party[$key] = $v->political_party_id;
+                foreach($parties as $key=>$v){
+                    $party[$key] = $v->political_party_id;
+                }
+
+                $param['parties'] = PoliticalParty::whereIn('id',$party)->get();
+                $param['state'] = state($id->state_id);
+                $param['ward'] = ward($id->ward_id);
+                $param['lga'] = lga($id->lga_id);
+                $param['centre'] = centre($id->polling_unit_id);
+                $param['election_name'] = $param['election']->name;
+                $param['resultInfo'] = $resultInfo;
+                $param['electionParties'] = $param['election']->fnAssignParties($id->state_id)->get();
+                $param['status'] = $resultInfo->status;
+                $param['api_token'] = $id['api_token'];
+                $param['election_id'] = $id->election_id;
+                $param['state_id'] = $id->state_id;
+                $param['lga_id'] = $id->lga_id;
+                $param['ward_id'] = $id->ward_id;
+                $param['polling_unit_id'] = $id->polling_unit_id;
+
+                return response()->json([
+                    'data' => $param
+                ]);
+
+            } else {
+                return response()->json([
+                    'data' => "Unauthorized Access"
+                ], 401);
             }
-
-            $param['parties'] = PoliticalParty::whereIn('id',$party)->get();
-            $param['state'] = state($id->state_id);
-            $param['ward'] = ward($id->ward_id);
-            $param['lga'] = lga($id->lga_id);
-            $param['centre'] = centre($id->id);
-            $param['election_name'] = $param['election']->name;
-            $param['resultInfo'] = $resultInfo;
-            $param['electionParties'] = $param['election']->fnAssignParties($id->state_id)->get();
-            $param['status'] = $resultInfo->status;
-            $param['api_token'] = $id['api_token'];
-            $param['election_id'] = $id->election_id;
-            $param['state_id'] = $id->state_id;
-            $param['lga_id'] = $id->lga_id;
-            $param['ward_id'] = $id->ward_id;
-            $param['polling_unit_id'] = $id->polling_unit_id;
-
-            return response()->json([
-                'data' => $param
-            ]);
-
-        } else {
+        } catch(Exception $e) {
             return response()->json([
                 'data' => "Unauthorized Access"
             ], 401);

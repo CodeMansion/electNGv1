@@ -26,6 +26,7 @@ Route::group(['prefix' => 'v1'], function() {
 	Route::post('ward', 'API\SubmitResultController@viewWard');
 	Route::post('polling-centres', 'API\SubmitResultController@viewCentres');
 	Route::post('submit-result', 'API\SubmitResultController@store');
+	Route::post('submit-reports', 'API\SubmitResultController@storeReports');
 });
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {

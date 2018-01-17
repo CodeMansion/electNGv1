@@ -4,10 +4,10 @@
 <div class="content" style="padding:60px;">
     <div class="container">
         <div class="row ">
-        <div class="col-4 col-xl-4"></div>
+            <div class="col-4 col-xl-4"></div>
             <div class="col-4 col-xl-4">
                 <div id="logo-hold">
-                    <center><img class="img-avatar" src="{{ asset('images/logo.png') }}" alt=""></center>
+                    <center><img class="img-avatar" src="{{ asset('images/elect-ng-logo.png') }}" alt=""></center>
                 </div>
                 @if ($errors->has('email'))
                     <div class="danger-well-login">
@@ -19,7 +19,7 @@
                         <strong>{{ $errors->first('password') }}</strong>
                     </div>
                 @endif
-                <div class="block block-content">
+                <div class="block block-content" style="background-color: #ffffff70;">
                     <form class="form-horizontal" method="POST" action="{{ route('login') }}">
                         {{ csrf_field() }}
 
@@ -42,12 +42,12 @@
                         </div>
                     </form>
                 </div>
-                <center>
-                    <p><a class="btn btn-link" href="{{ route('password.request') }}">Forgot Your Password?</a> </p>
-                </center>
-            </div>
+            </div>  
+            <div class="col-4 col-xl-4"></div>
         </div>
-        <div class="col-4 col-xl-4"></div>
+        <div style="bottom:0;color: white;font-size: 15px;padding: 5px;margin-top:50px;">
+        <center>Powered By: <a href="https://codemansion.org" target="_blank" style="color: white;">CodeMansion Technology</a></center>
+    </div>
     </div>
 </div>
 @endsection
