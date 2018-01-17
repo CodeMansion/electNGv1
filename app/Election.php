@@ -38,22 +38,13 @@ class Election extends Model
     }
 
     public function fnAssignParties(){
-        return $this->belongsToMany('App\PoliticalParty', 'pivot_election_party')
+        return $this->belongsToMany('App\PoliticalParty', 'pivot_election_parties')
                 ->orderBy("code")
                 ->select(["political_parties.*"]);
     }
 
-    public function fnApprovedPasscodes() {
-        $passcodes = \DB::table("pivot_election_users_passcode")
-                ->where("state_id","=",config('constants.ACTIVE_STATE_ID'))
-                ->where("election_id","=",$this->id);
-
-        return $passcodes;
-    }
-
     public function fnPollingUnits(){
         $polling_list = \DB::table("pivot_election_polling_units")
-                // ->where("pivot_election_polling_units.state_id","=",1)
                 ->where("pivot_election_polling_units.election_id", "=", $this->id);
 
         return $polling_list;
@@ -64,7 +55,7 @@ class Election extends Model
         if($type == 'state'){
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_result_$code")
+            $result = \DB::table("polling_".$code."_results")
                             ->where("state_id","=",$state_id)
                             ->where("election_id","=",$this->id);
             
@@ -74,7 +65,7 @@ class Election extends Model
         if($type == 'local'){
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_result_$code")
+            $result = \DB::table("polling_".$code."_results")
                             ->where("election_id","=",$this->id)
                             ->where("state_id","=",$state_id)
                             ->where("constituency_id","=",$const_id)
@@ -86,7 +77,7 @@ class Election extends Model
         if($type == 'constituency') {
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_result_$code")
+            $result = \DB::table("polling_".$code."_results")
                             ->where("state_id","=",$state_id)
                             ->where("constituency_id","=",$const_id)
                             ->where("election_id","=",$this->id);
@@ -97,7 +88,7 @@ class Election extends Model
         if($type == 'ward') {
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_result_$code")
+            $result = \DB::table("polling_".$code."_results")
                             ->where("state_id","=",$state_id)
                             ->where("constituency_id","=",$const_id)
                             ->where("lga_id","=",$lga_id)
@@ -110,7 +101,7 @@ class Election extends Model
         if($type == 'polling-station') {
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_result_$code")
+            $result = \DB::table("polling_".$code."_results")
                             ->where("state_id","=",$state_id)
                             ->where("lga_id","=",$lga_id)
                             ->where("ward_id","=",$ward_id)
@@ -209,5 +200,34 @@ class Election extends Model
             }
             return $Ret;  
         }
+    }
+
+    public function get_latest_submitted_result() {
+        $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
+        $code = $ElectionCode['election_code'];
+        $result = \DB::table("polling_".$code."_results")->where("election_id","=",$this->id)->where("step","=",2)->first();
+        
+        return $result;
+    }
+
+    public function get_all_total_result(){
+        $Ret = [];
+        $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
+        $code = $ElectionCode['election_code'];
+        $result = \DB::table("polling_".$code."_results")->where("election_id","=",$this->id)->get();
+        
+        $parties = $this->fnAssignParties()->get();
+        foreach($parties as $i => $party) {
+            $code = strtolower($party['code']);
+            $Ret[$code] = 0;
+        }
+
+        foreach($result as $k => $val){
+            foreach($parties as $i => $party) {
+                $code = strtolower($party['code']);
+                $Ret[$code] += (int)$val->$code;
+            }
+        }
+        return $Ret;
     }
 }

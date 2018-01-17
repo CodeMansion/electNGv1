@@ -163,20 +163,21 @@ class SubmitResultController extends Controller
      */
     public function store(Request $request)
     {
+        #TODO:: Processes in the function
+        //1. 
+        
         $data = $request->all();
         $parties = $data['formData'];
-        foreach($parties as $p){
-            
-        }
-
+        $date = new \DateTime();
+        
         \DB::beginTransaction();
         try{
             //gettting the political parties
             $param['election'] = Election::find($data['election_id']);
             $param['electionParties'] = $param['election']->fnAssignParties()->get();
+            
             //getting the election index code
-            $IndexCode = ElectionResultIndex::where('election_id','=',$data['election_id'])
-                            ->where('state_id','=',$data['state_id'])->first();
+            $IndexCode = ElectionResultIndex::where('election_id','=',$data['election_id'])->first();
             $IC = $IndexCode['election_code'];
 
             //collating the dataset collect from the user
@@ -189,27 +190,85 @@ class SubmitResultController extends Controller
                         $new['void_voters'] = (int)$data['void_voters'];
                         $new['confirmed_voters'] = (int)$data['confirmed_voters'];
                         $new['status'] = 2;
+                        $new['step'] = 2;
+                        $new['updated_at'] = date('Y-m-d h:m:s',$date->getTimestamp());
+                        $new['created_at'] = date('Y-m-d h:m:s',$date->getTimestamp());
                         $new[strtolower($code)] = (int)$p;
                     }
                 }
             }
+
+            //resetting latest submitted result ordering to default
+            $resultInfo = \DB::table("polling_".$IC."_results")
+                    ->where('election_id','=',$data['election_id'])
+                    ->update(['step'=>1]);
             
             //updating the the election result with data from the polling station
-            $resultInfo = \DB::table("polling_result_$IC")
+            $resultInfo = \DB::table("polling_".$IC."_results")
                     ->where('election_id','=',$data['election_id'])
                     ->where('state_id','=',$data['state_id'])
                     ->where('lga_id','=',$data['lga_id'])
                     ->where('ward_id','=',$data['ward_id'])
                     ->where('polling_station_id','=',$data['polling_unit_id'])
                     ->update($new);
-            
+
             if($resultInfo){
                 //marking the passcode as used and making sure it is not used the second time
                 \DB::table("election_onetime_passwords")->where('api_token','=',$data['token'])->update(['status'=>2]);
+
+                //notifying admin of new result
                 
                 \DB::commit();
                 return response()->json([
                     'data' => 'Result submitted successfully.'
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => "Internal Error Occured"
+                ], 401);
+            }
+
+        } catch(Exception $e) {
+            \DB::rollback();
+            return response()->json([
+                'data' => "Unauthorized Access"
+            ], 401);
+        }
+    }
+
+
+    public function storeReports(Request $request)
+    {
+        #TODO:: Processes in the function
+        //1. 
+
+
+        $data = $request->all();
+        
+        \DB::beginTransaction();
+        try{
+            //gettting the political parties
+            $param['election'] = Election::find($data['election_id']);
+
+            $report = \DB::table("pivot_election_reports")->insert([
+                'election_id' => $data['election_id'],
+                'state_id' => $data['state_id'],
+                'lga_id' => $data['lga_id'],
+                'ward_id' => $data['ward_id'],
+                'polling_unit_id' => $data['polling_unit_id'],
+                'status' => 2,
+                'comment' => $data['reports'],
+                'title': => $data['titles'],
+                'created_at' => date('Y-m-d h:m:s',$date->getTimestamp()),
+                'updated_at' => date('Y-m-d h:m:s',$date->getTimestamp())
+            ]);
+
+            //notifying of new reports
+            
+            if($report){
+                \DB::commit();
+                return response()->json([
+                    'data' => 'Report submitted successfully.'
                 ], 200);
             } else {
                 return response()->json([

@@ -23,12 +23,14 @@ Route::group(['middleware'=>['auth']], function(){
         Route::get('/election-view/{id?}', array('as'=>'Election.ViewOne','uses'=>'ElectionController@view'));
         Route::get('/submitted-result/{id?}', array('as'=>'SubmittedResult','uses'=>'ElectionController@viewSubmittedResult'));
         Route::get('/passcode-view/{id?}', array('as'=>'PasscodeView','uses'=>'ElectionController@passcodeView'));
+        Route::get('/infographics-view/{id?}', array('as'=>'InfographicView','uses'=>'ElectionController@InfographicView'));
         Route::post('/ajax-calls', array('as'=>'ElectionAjax','uses'=>'ElectionController@AjaxProcess'));
         Route::post('/change-status', array('as'=>'Election.ChangeStatus','uses'=>'ElectionController@changeStatus'));
         Route::post('/check-passcode', array('as'=>'CheckPasscode','uses'=>'ElectionController@checkPasscode'));
         Route::put('/submit-result', array('as'=>'SubmitResult','uses'=>'ElectionController@submitResult'));
         Route::post('dashboard-stats', array('as'=>'Election.Stats','uses'=>'ElectionController@showStats'));
         Route::post('query-api', array('as'=>'QueryApi','uses'=>'ElectionController@queryResult'));
+        Route::get('/reports/{id?}', array('as'=>'view.reports','uses'=>'ElectionController@reportsIndex'));
     });
 
     //-- STATES ROUTES --//

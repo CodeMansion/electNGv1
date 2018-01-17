@@ -30,7 +30,7 @@ class HomeController extends Controller
         $user = User::find(auth()->user()->id);
 
         if($user->user_type_id == 1) {
-            return view('admin.election.index')->with($data);
+            return view('admin.dashboard')->with($data);
         } elseif($user->user_type_id == 2 || $user->user_type_id == 3) {
             $id = \DB::table("election_candidates")->where("user_id","=",auth()->user()->id)->first();
             if($id){

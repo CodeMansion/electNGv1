@@ -6,7 +6,7 @@
     <style>
         .content .block-content label {
             margin-right: 10px;
-            font-size: 20px;
+            font-size: 15px;
         }
     </style>
     {!! Charts::assets() !!}
@@ -38,6 +38,10 @@
                                     <button class="btn btn-sm btn-info create-hover" id="details" type="button"><i class="si si-bar-chart"></i> View Election Summary</button>
                                 @endif
                             </form>
+                            <button class="btn btn-sm btn-secondary create-hover" type="button">
+                                <a href="{{URL::route('Election.View')}}">
+                                <i class="fa fa-dashboard"></i> Dashboard</a>
+                            </button>
                             <div class="block-options">
                                 <div class="dropdown">
                                     <button type="button" class="btn-block-option dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">OTHER OPTIONS</button>
@@ -48,9 +52,15 @@
                                         <a class="dropdown-item" href="javascript:void(0)">
                                             <i class="si si-printer mr-5"></i>Print Result
                                         </a>
+                                        <a class="dropdown-item" href="{{URL::route('view.reports',$election['slug'])}}">
+                                            <i class="si si-tag mr-5"></i>View Reports
+                                        </a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="{{URL::route('PasscodeView',$election['slug'])}}">
                                             <i class="si si-tag mr-5"></i>View Election Passcode
+                                        </a>
+                                        <a class="dropdown-item" href="{{URL::route('InfographicView',$election['slug'])}}">
+                                            <i class="si si-tag mr-5"></i>View Infographics
                                         </a>
                                         <a data-toggle="modal" data-target="#assignCandidate" class="dropdown-item" href="javascript:void(0)">
                                             <i class="si si-user mr-5"></i>Election Candidate
@@ -60,33 +70,10 @@
                             </div>
                             @endcan
                         </div>
-                        <div class="block-content">
-                            @include('admin.election.partials._result_query')
-                        </div>
+                        
                     </div>
                 </div>
             </div>
-            <?php if($settings->party_counter == 1) {?>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="js-slider text-center" data-autoplay="true" data-dots="true" data-arrows="true" data-slides-to-show="3">
-                            @foreach($resultSummary as $key => $value)
-                                <div class="col-3 " style="border-left: 4px solid #ECF0F1;">
-                                    <a class="block block-link-shadow text-right" href="javascript:void(0)">
-                                        <div class="block-content block-content-full clearfix">
-                                            <div class="float-left mt-10 d-none d-sm-block">
-                                                <i class="si si-bag fa-3x text-body-bg-dark"></i>
-                                            </div>
-                                            <div class="font-size-h3 font-w600" data-toggle="countTo" data-speed="1000" data-to="{{$value}}">0</div>
-                                            <div class="font-size-h4 font-w600 text-uppercase text-muted">{{$key}}</div>
-                                        </div>
-                                    </a>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            <?php } ?>
             <div id="loader" style="display:none;margin-top:100px;">
                 <center><img src="{{asset('images/loading.gif')}}"></center>
             </div>
@@ -99,8 +86,8 @@
         var millisec =parseInt({{ $settings->page_refresh_interval }});
         //page refresh function for dashbboard
         function page_refresh_stats(){
-            $('#loader').show();
-            $("#stats").hide();
+            // $('#loader').show();
+            // $("#stats").hide();
             $.ajax({
                 url: "{{URL::route('Election.Stats')}}", 
                 method: "POST",

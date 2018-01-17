@@ -75,14 +75,14 @@ function bulkUpload($type,$file=null)
             if($data->count()){
                 \DB::table('polling_stations')->truncate();
                 foreach ($data as $key => $value) {
-                    \DB::table('polling_stations')->insert([
-                        'slug' => bin2hex(random_bytes(64)),
-                        'state_id' => $value->state_id, 
-                        'constituency_id' => $value->constituency_id,
-                        'lga_id' => $value->lga_id,
-                        'ward_id' => $value->ward_id,
-                        'name' => $value->name
-                    ]);
+                    $new = new \App\PollingStation();
+                    $new->slug = bin2hex(random_bytes(64));
+                    $new->state_id = $value->state_id;
+                    $new->constituency_id = $value->constituency_id;
+                    $new->lga_id = $value->lga_id;
+                    $new->ward_id = $value->ward_id;
+                    $new->name = $value->name;
+                    $new->save();
                 }
                 if(!empty($arr)){
                     return true;

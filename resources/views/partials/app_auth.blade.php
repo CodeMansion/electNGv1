@@ -6,16 +6,16 @@
         <meta name="author" content="">
         <meta name="description" content="" />
         
-        <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/png" />
+        <link rel="shortcut icon" href="{{ asset('images/elect-ng-logo.png') }}" type="image/png" />
 
-        <title>ElectNG&trade; | Login Page </title>
+        <title>Elect-NG&trade; | Login Page </title>
         <link href="{{ asset('css/codebase.min.css') }}" rel="stylesheet">
         <link href="{{ asset('css/login-custom.css') }}" rel="stylesheet">
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 
         @yield('extra_style')
     </head>
-    <body>
+    <body style="background-image:url({{ asset('images/login.png') }});background-size:cover;background-repeat: no-repeat;">
         @yield('login_content')
     </body>
 

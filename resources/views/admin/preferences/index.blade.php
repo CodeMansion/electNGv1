@@ -8,75 +8,131 @@
 @section('content')
     <main id="main-container">
         <!-- Page Content -->
-        <div class="content">
-            <div class="row" style="">
-                <div class="col-12 col-xl-12">
-                    <div class="block block-content title-hold">
-                        <div class="col-md-12">
-                            <h3 style="margin-bottom:5px;">
-                                <i class="si si-settings"></i> Preferences
-                                <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
-                            </h3><hr/>
-                            <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
-                            @include('partials.notifications')
-                        </div>
+        <div class="content container">
+            @include('partials.notifications')
+            <div class="row">
+                <div class="block block-content title-hold">
+                    <div class="col-12 col-xl-12">
+                        <h3 style="margin-bottom:5px;"><i class="si si-settings"></i> Preferences</h3><br/>
+                        <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-5 col-xl-5">
-                    <div class="block">
-                    <div class="block-content">
-                        <form action="{{URL::route('preference.Store')}}" method="POST">{{csrf_field()}}
-                            <div class="form-group">
-                                <label>Enable Page Refresh</label>
-                                <div>
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="page_refresh" value="1" <?php if($settings->page_refresh === 1){ ?> checked <?php } ?> > Yes
-                                    </div>  
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="page_refresh" value="0" <?php if($settings->page_refresh === 0){ ?> checked <?php } ?> > No
-                                    </div>
+                <div class="block block-content">
+                    <div class="col-7 col-xl-7">
+                        <form action="{{URL::route('preference.Store')}}" class="form-horizontal" method="POST">{{csrf_field()}}
+                            <h5>Out-going Mail Settings</h5>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label" for="example-hf-email">Host</label>
+                                <div class="col-lg-7">
+                                    <input type="email" class="form-control" id="example-hf-email" name="example-hf-email" placeholder="Enter Email..">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Page Refresh Interval</label>
-                                <div>
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="interval" value="10000" <?php if($settings->page_refresh_interval === 10000){ ?> checked <?php } ?> > 10 Sec
-                                    </div>  
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="interval" value="20000" <?php if($settings->page_refresh_interval === 20000){ ?> checked <?php } ?> > 20 Sec
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="interval" value="30000" <?php if($settings->page_refresh_interval === 30000){ ?> checked <?php } ?> > 30 Sec
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="interval" value="60000" <?php if($settings->page_refresh_interval === 60000){ ?> checked <?php } ?> > 60 Sec
-                                    </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label" for="example-hf-email">Port</label>
+                                <div class="col-lg-7">
+                                    <input type="email" class="form-control" id="example-hf-email" name="example-hf-email" placeholder="Enter Email..">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Enable Sound Notification </label>
-                                <div> 
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="sound" value="1" <?php if($settings->sound_notification === 1){ ?> checked <?php } ?> > Yes
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="sound" value="0" <?php if($settings->sound_notification === 0){ ?> checked <?php } ?>> No
-                                    </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label" for="example-hf-email">Username</label>
+                                <div class="col-lg-7">
+                                    <input type="email" class="form-control" id="example-hf-email" name="example-hf-email" placeholder="Enter Email..">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Enable Party Counter Display </label>
-                                <div> 
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="party_counter" value="1" <?php if($settings->party_counter === 1){ ?> checked <?php } ?> > Yes
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <input type="radio" name="party_counter" value="0" <?php if($settings->party_counter === 0){ ?> checked <?php } ?>> No
-                                    </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label" for="example-hf-email">Password</label>
+                                <div class="col-lg-7">
+                                    <input type="email" class="form-control" id="example-hf-email" name="example-hf-email" placeholder="Enter Email..">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label" for="example-hf-email">Encryption</label>
+                                <div class="col-lg-7">
+                                    <input type="email" class="form-control" id="example-hf-email" name="example-hf-email" placeholder="Enter Email..">
+                                </div>
+                            </div>
+
+                            <h5>Preferences</h5>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Enable Page Refresh</label>
+                                <div class="col-lg-7">
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio1" name="page_refresh" value="1" <?php if($settings->page_refresh === 1){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">YES</span>
+                                    </label>
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" name="page_refresh" value="0" <?php if($settings->page_refresh === 0){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">NO</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Page Refresh Time</label>
+                                <div class="col-lg-9">
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio1" name="interval" 
+                                        value="10000" <?php if($settings->page_refresh_interval === 10000){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">10 SEC</span>
+                                    </label>
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio2" name="interval" 
+                                        value="20000" <?php if($settings->page_refresh_interval === 20000){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">20 SEC</span>
+                                    </label>
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio3" name="interval" 
+                                        value="30000" <?php if($settings->page_refresh_interval === 30000){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">30 SEC</span>
+                                    </label>
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio3" name="interval" 
+                                        value="60000" <?php if($settings->page_refresh_interval === 60000){ ?> checked <?php } ?>>
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">60 SEC</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Enable Sound</label>
+                                <div class="col-lg-9">
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio3"  name="sound" 
+                                        value="1" <?php if($settings->sound_notification === 1){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">YES</span>
+                                    </label>
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio3" name="sound" 
+                                        value="0" <?php if($settings->sound_notification === 0){ ?> checked <?php } ?>>
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">NO</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-lg-3 col-form-label">Counter Display</label>
+                                <div class="col-lg-9">
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio3" 
+                                        name="party_counter" value="1" <?php if($settings->party_counter === 1){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">YES</span>
+                                    </label>
+                                    <label class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="example-inline-radio3" 
+                                        name="party_counter" value="0" <?php if($settings->party_counter === 0){ ?> checked <?php } ?> >
+                                        <span class="custom-control-indicator"></span>
+                                        <span class="custom-control-description">NO</span>
+                                    </label>                                    
                                 </div>
                             </div>
                             <div class="form-group">
@@ -84,10 +140,6 @@
                             </div>
                         </form>
                     </div>
-                    </div>
-                </div>
-                <div class="col-7 col-xl-7">
-                    
                 </div>
             </div>
         </div>

@@ -8,60 +8,56 @@
 @section('content')
     <main id="main-container">
         <!-- Page Content -->
-        <div class="content">
-            <div class="row" style="">
-                <div class="col-12 col-xl-12">
-                    <div class="block block-content title-hold">
-                        <div class="col-md-12">
-                            <h3 style="margin-bottom:5px;">
-                                <i class="si si-users"></i> States 
-                                <p class="p-10 bg-primary-lighter text-primary-dark pull-right">{{config('constants.ACTIVE_STATE_NAME')}} - State</p>
-
-                            </h3><hr/>
-                            <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
-                            @include('partials.notifications')
-                        </div>
+        <div class="content container">
+            <div class="row">
+                @include('partials.notifications')
+                <div class="block block-content title-hold">
+                    <div class="col-md-12">
+                        <h3 style="margin-bottom:5px;"><i class="si si-users"></i> States and LGAs </h3><br/>
+                        <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-12 col-xl-12">
-                    <div class="block block-content content-hold">
+                <div class="block block-content title-hold">
+                    <div class="col-6 col-xl-6">
                         @if(count($states) < 1)
-                            <div class="danger-well">
-                                <em>There are no users on this system. User to button above to create a new user.</em>
-                            </div>
+                        <div class="danger-well">
+                            <em>There are no states on this system. </em>
+                        </div>
                         @else
-                            <table class="table table-striped js-dataTable-full">
-                                <thead>
+                        <table class="table table-striped js-dataTable-full">
+                            <thead>
+                                <tr>
+                                    <th width="50"><input type="checkbox" name="" value=""></th>
+                                    <th>States</th>
+                                    <th>LGA Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php($index=0)
+                                @foreach($states as $state)
                                     <tr>
-                                        <th width="50"><input type="checkbox" name="" value=""></th>
-                                        <th>States</th>
-                                        <th>LGA Count</th>
+                                        <td><input type="checkbox" name="" value=""></td>
+                                        <td class="state_{{$index}}">
+                                            <a href="">{{$state['name']}}</a><br/>
+                                            <span id="user-view{{$index}}" style="display:none;color:grey;" style="font-size: 12px;">
+                                                <a href="#"><i class="fa fa-edit"></i> Edit</a> | 
+                                                <span id="activate_{{$index}}"><a href="#"><i class="fa fa-cog"></i> Activate</a></span>
+                                                <span id="activate_{{$index}}"><a href="#"><i class="fa fa-adjust"></i> View LGA</a></span>
+                                                <input id="state_id_{{$index}}" value="{{$state['id']}}" type="hidden"> 
+                                            </span>
+                                        </td>
+                                        <td>{{count($state->Lgas)}}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @php($index=0)
-                                    @foreach($states as $state)
-                                        <tr>
-                                            <td><input type="checkbox" name="" value=""></td>
-                                            <td class="state_{{$index}}">
-                                                <a href="">{{$state['name']}}</a><br/>
-                                                <span id="user-view{{$index}}" style="display:none;color:grey;" style="font-size: 12px;">
-                                                    <a href="#"><i class="fa fa-edit"></i> Edit</a> | 
-                                                    <span id="activate_{{$index}}"><a href="#"><i class="fa fa-cog"></i> Activate</a></span>
-                                                    <input id="state_id_{{$index}}" value="{{$state['id']}}" type="hidden"> 
-                                                </span>
-                                            </td>
-                                            <td>{{count($state->Lgas)}}</td>
-                                        </tr>
-                                    @php($index++)
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                @php($index++)
+                                @endforeach
+                            </tbody>
+                        </table>
                         @endif
                     </div>
+                    <div class="col-6 col-xl-6"></div>
                 </div>
             </div>
         </div>
