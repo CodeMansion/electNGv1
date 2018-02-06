@@ -65,115 +65,12 @@
     <script src="{{ asset('js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ asset('js/plugins/select2/select2.full.min.js')}}"></script>
     <script src="{{ asset('js/pages/be_forms_plugins.js') }}"></script>
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $("#view-parties").hide();
-            $("#view-states").hide();
-            $("#lga").hide();
-            $("#const").hide();
-
-            $("select[name=type]").on("change", function() {
-                if($(this).val() == '1') {
-                    $("#view-parties").hide();
-                    $("#view-states").hide();
-                    $("#lga").hide();
-                    $("#const").hide();
-
-                    $("#view-parties").show();
-                }
-
-                if($(this).val() == '2') {
-                    $("#view-parties").hide();
-                    $("#view-states").hide();
-                    $("#lga").hide();
-                    $("#const").hide();
-                    
-                    $("#view-states").show();
-                    $("#view-parties").show();
-                }
-
-                if($(this).val() == '3') {
-                    $("#view-parties").hide();
-                    $("#view-states").hide();
-                    $("#lga").hide();
-                    $("#const").hide();
-
-                    $("#view-states").show();
-                    $("#const").show();
-                    $("#view-parties").show();
-                }
-
-                if($(this).val() == '4') {
-                    $("#view-states").hide();
-                    $("#lga").hide();
-                    $("#const").hide();
-
-                    $("#view-parties").show();
-                    $("#view-states").show();
-                    $("#lga").show();
-                    $("#const").show();
-                }
-
-                if($(this).val() == '') {
-                    $("#view-parties").hide();
-                    $("#view-states").hide();
-                    $("#lga").hide();
-                    $("#const").hide();
-                }
-            });
-
-            $("select[name=state_id]").on("change", function() {
-                var state_id = $(this).val();
-                $.ajax({
-                    url: "{{URL::route('ElectionAjax')}}",
-                    method: "POST",
-                    data:{
-                        '_token': "{{csrf_token()}}",
-                        'state_id': state_id,
-                        'req': "viewConst"
-                    },
-                    success: function(data){
-                        $("#view-const").html(data);
-                    },
-                    error: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Oops! Error","An Error Occured!", "error");
-                    }
-                });
-            });
-
-            $("select[name=constituency_id]").on("change", function() {
-                var constituency_id = $(this).val();
-                var state_id = $("select[name=state_id]").val();
-                $.ajax({
-                    url: "{{URL::route('ElectionAjax')}}",
-                    method: "POST",
-                    data:{
-                        '_token': "{{csrf_token()}}",
-                        'constituency_id': constituency_id,
-                        'state_id': state_id,
-                        'req': "viewLga"
-                    },
-                    success: function(data){
-                        $("#view-lga").html(data);
-                    },
-                    error: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Oops! Error","An Error Occured!", "error");
-                    }
-                });
-            });
-
-            $("#submit-election").on("click", function() {
-                $.LoadingOverlay("show");
-            });
-
-            $("select[name=lga_id]").on("change", function() {
-                $("#view-parties").show();
-            });
-        });    
+    <script>
+        var URL = "{{URL::route('Election.New')}}";
+        var URL_CHECK = "{{URL::route('ElectionAjax')}}";
+        var TOKEN = "{{csrf_token()}}";
     </script>
+    <script src="{{ asset('js/pages/election.js') }}"></script>
     <script>
         jQuery(function () {
             // Init page helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Input + Range Sliders + Tags Inputs plugins)

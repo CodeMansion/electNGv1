@@ -258,7 +258,7 @@ class SubmitResultController extends Controller
                 'polling_unit_id' => $data['polling_unit_id'],
                 'status' => 2,
                 'comment' => $data['reports'],
-                'title': => $data['titles'],
+                'title' => $data['titles'],
                 'created_at' => date('Y-m-d h:m:s',$date->getTimestamp()),
                 'updated_at' => date('Y-m-d h:m:s',$date->getTimestamp())
             ]);

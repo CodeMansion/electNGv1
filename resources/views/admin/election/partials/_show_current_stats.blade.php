@@ -1,8 +1,8 @@
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div style="overflow-y: scroll; height: 700px;">
             @foreach($resultSummary as $key => $value)
-                <div class="col-12 " style="border-left: 4px solid #ECF0F1;">
+                <div class="col-12 ">
                     <a class="block block-link-shadow text-right" href="javascript:void(0)">
                         <div class="block-content block-content-full clearfix">
                             <div class="float-left mt-10 d-none d-sm-block">
@@ -16,7 +16,7 @@
             @endforeach
         </div>
     </div>
-    <div class="col-md-9">
+    <div class="col-md-10">
         <div class="row">
             <div class="col-12 col-xl-12">
                 @if($latest)
@@ -58,24 +58,21 @@
                 <div class="block">
                     <div class="block-content">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12">
                                 {!! $barChart->render() !!}
-                            </div>
-                            <div class="col-6">
-                                {!! $pieChart->render() !!}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                {!! $areaChart->render() !!}
-                            </div>
-                            <div class="col-6">
-                                {!! $donutChart->render() !!}
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                
+                                {!! $areaChart->render() !!}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                {!! $donutChart->render() !!}
+                            </div>
+                            <div class="col-6">
+                                {!! $pieChart->render() !!}
                             </div>
                         </div>
                     </div>

@@ -15,7 +15,6 @@ class CreateElectionResultIndicesTable extends Migration
     {
         Schema::create('election_result_indices', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('state_id')->unsigned()->index();
             $table->integer('election_id')->unsigned()->index();
             $table->string('election_code');
             $table->timestamps();

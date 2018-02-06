@@ -44,14 +44,22 @@ class Election extends Model
     }
 
     public function fnPollingUnits(){
-        $polling_list = \DB::table("pivot_election_polling_units")
-                ->where("pivot_election_polling_units.election_id", "=", $this->id);
+        $polling_list = \DB::table("election_onetime_passwords")
+                ->where("election_onetime_passwords.election_id", "=", $this->id);
 
         return $polling_list;
     }
 
 
     public function get_polling_result($type,$state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$unit_id=null){
+        if($type == 'general'){
+            $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
+            $code = $ElectionCode['election_code'];
+            $result = \DB::table("polling_".$code."_results")->where("election_id","=",$this->id);
+            
+            return $result;
+        }
+
         if($type == 'state'){
             $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
             $code = $ElectionCode['election_code'];
@@ -123,6 +131,22 @@ class Election extends Model
         foreach($parties as $i => $party) {
             $code = strtolower($party['code']);
             $Ret[$code] = 0;
+        }
+
+        //querying result based on presidency level
+        if($type == 'general'){
+            $result = $this->get_polling_result('general')->get();
+
+            //looping through the result to able to calculate total for each parties 
+            //under this election
+            foreach($result as $k => $val){
+                foreach($parties as $i => $party) {
+                    $code = strtolower($party['code']);
+                    $Ret[$code] += (int)$val->$code;
+                }
+            }
+
+            return $Ret;  
         }
 
         //querying result based on state level

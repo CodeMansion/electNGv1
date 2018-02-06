@@ -17,7 +17,7 @@ class PreferencesTableSeeder extends Seeder
             [
                 'id' => 1,
                 'page_refresh' => 1,
-                'page_refresh_interval' => 3,
+                'page_refresh_interval' => 30000,
                 'sound_notification' => 1,
                 'party_counter' => 1
             ],

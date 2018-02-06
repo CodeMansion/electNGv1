@@ -2,30 +2,15 @@
 
 @section('content')
     <main id="main-container">
-        <div class="content container">
+        <div class="content">
             <div class="row" style="">
                 <div class="col-12 col-xl-12">
                     @include('partials.notifications')
                     <div class="block">
                         <div class="block-header block-header-default">
-                            <h3 class="block-title">
-                                <i class="si si-feed"></i> {{$election['name']}} 
-                                <span class="badge badge-{{$election->status->class}}"><i class=""></i> {{$election->status->name}}</span>
-                            </h3>
-                            @can('super_admin')
-                                <form action="{{URL::route('Election.ChangeStatus')}}" method="POST">{{csrf_field()}}
-                                    <input type="hidden" name="election_id" value="{{$election['slug']}}">
-                                    @if($election['election_status_id'] == 1)
-                                        <input type="hidden" name="type" value="begin">
-                                        <button class="btn btn-sm btn-default create-hover" id="begin" type="submit"><i class="si si-power"></i> Start Election</button> 
-                                    @elseif($election['election_status_id'] == 2)
-                                        <input type="hidden" name="type" value="end">
-                                        <button class="btn btn-sm btn-warning create-hover" id="end" type="submit"><i class="si si-lock"></i> End Election</button>
-                                    @elseif($election['election_status_id'] == 3)
-                                        <button class="btn btn-sm btn-info create-hover" id="details" type="button"><i class="si si-bar-chart"></i> View Election Summary</button>
-                                    @endif
-                                </form>
-                            @endcan
+                            <h2 class="block-title">
+                                <i class="si si-feed"></i> Latest Submitted Results
+                            </h2>
                         </div>
                         <div class="block-content">
                             <p><a href="{{URL::route('Election.ViewOne',$election['slug'])}}"><i class="si si-arrow-left"></i> Return Back</a></p>

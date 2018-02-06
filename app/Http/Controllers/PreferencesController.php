@@ -27,24 +27,39 @@ class PreferencesController extends Controller
 
     public function storeBulkUpload(Request $request)
     {
-        if($request->hasFile('file')){
-            
-             try {
-                //  ini_set('max_execution_time', 800);
-                 $time_start = microtime(true);
-                 
-                 bulkUpload($request->get('upload-type'),$request->file('file'));
- 
-                 $time_end = microtime(true);
-                 $execution_time = ($time_end - $time_start)/60;
+        $data = $request->except('_token');
 
-                 return redirect()->back()->with('success',"Upload Completed successfully in $execution_time Mins");
+        if($request->hasFile('file')){
+            // \DB::beginTransaction();
+            try {
+                ini_set('max_execution_time',0);
+                $time_start = microtime(true);
+                
+                bulkUpload($data['upload_type'],$data['query_type'],$request->file('file'));
+                
+                $time_end = microtime(true);
+                $execution_time = ($time_end - $time_start)/60;
+
+                // \DB::commit();
+                return $response = [
+                    'msg' => "Upload Completed successfully in $execution_time Mins",
+                    'type' => "true"
+                ];
+
+            } catch(Exception $e) {
+                // \DB::rollback();
+                return $response = [
+                    'msg' => "File could not upload",
+                    'type' => "false"
+                ];
+            }
  
-             } catch(Exception $e) {
-                 return redirect()->back()->with("error",$e->getMessage());
-             }
- 
-         } else { return redirect()->back()->with("error","Invalid Request"); }
+        } else { 
+            return $response = [
+                'msg' => "Invalid file!",
+                'type' => "false"
+            ]; 
+        }
     }
 
     /**

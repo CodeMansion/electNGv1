@@ -1,53 +1,56 @@
 @extends('partials.app_auth')
 
 @section('login_content')
-<div class="content" style="padding:60px;">
-    <div class="container">
-        <div class="row ">
-            <div class="col-4 col-xl-4"></div>
-            <div class="col-4 col-xl-4">
-                <div id="logo-hold">
-                    <center><img class="img-avatar" src="{{ asset('images/elect-ng-logo.png') }}" alt=""></center>
-                </div>
-                @if ($errors->has('email'))
-                    <div class="danger-well-login">
-                        <strong>{{ $errors->first('email') }}</strong>
-                    </div>
-                @endif
-                @if ($errors->has('password'))
-                    <div class="danger-well-login">
-                        <strong>{{ $errors->first('password') }}</strong>
-                    </div>
-                @endif
-                <div class="block block-content" style="background-color: #ffffff70;">
-                    <form class="form-horizontal" method="POST" action="{{ route('login') }}">
-                        {{ csrf_field() }}
+<div class="content">
+    <div class="row">
+        <div class="section"></div>
+            <div class="col s10 offset-s1">
+                <form method="POST" action="{{ route('login') }}"> {{ csrf_field() }}
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col s6 offset-s1"></div>
+                                <div class="col s4">
+                                    <div id="logo-hold">
+                                        <center>
+                                            <a href="https://codemansion.org">
+                                                <img style="height: 150px;width:150px;" src="{{ asset('images/elect-ng-logo.png') }}" alt="ElectNG Logo">
+                                            </a>
+                                        </center>
+                                    </div>
+                                    @if ($errors->has('email'))
+                                        <div class="danger-well-login">
+                                            <strong>{{ $errors->first('email') }}</strong>
+                                        </div>
+                                    @endif
+                                    @if ($errors->has('password'))
+                                        <div class="danger-well-login">
+                                            <strong>{{ $errors->first('password') }}</strong>
+                                        </div>
+                                    @endif
 
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}"><label for="email" class="control-label">E-Mail Address</label>
-                            <div class="">
-                                <input id="email" type="email" class="input-box form-control" name="email" value="{{ old('email') }}" required autofocus>
-                            </div>
-                        </div>
+                                    <div class="input-field{{ $errors->has('email') ? ' has-error' : '' }}">
+                                        <i class="material-icons prefix">account_circle</i>
+                                        <input id="email" type="email"  class="validate" name="email" value="{{ old('email') }}" required autofocus>
+                                        <label for="icon_prefix">Email</label>
+                                    </div>
 
-                        <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <label for="password" class=" control-label">Password</label>
-                            <div class="">
-                                <input id="password" type="password" class="input-box form-control" name="password" required>
-                            </div>
+                                    <div class="input-field{{ $errors->has('password') ? ' has-error' : '' }}">
+                                        <i class="material-icons prefix">lock</i>
+                                        <input id="password" type="password" class="validate" name="password" required>
+                                        <label for="icon_prefix">Password</label>
+                                    </div>
+                                    <div class="section"></div>
+                                    <div class="section"></div>
+                                    <button type="submit" class="btn btn-fill btn-wd btn-block">Login</button> 
+                                </div>
+                            </div><br/>
+                            <center><p><b>Powered By: <a href="https://codemansion.org" target="_blank">CodeMansion Technology</a></b> | All Rights Reserved.</p></center>
                         </div>
-                        <div class="form-group">
-                            <div class="">
-                                <button type="submit" class="input-box form-control create-hover btn btn-alt-primary">Login</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>  
-            <div class="col-4 col-xl-4"></div>
         </div>
-        <div style="bottom:0;color: white;font-size: 15px;padding: 5px;margin-top:50px;">
-        <center>Powered By: <a href="https://codemansion.org" target="_blank" style="color: white;">CodeMansion Technology</a></center>
-    </div>
     </div>
 </div>
 @endsection

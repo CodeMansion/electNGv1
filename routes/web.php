@@ -10,10 +10,10 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', 'HomeController@index')->name('home');
 
 Route::group(['middleware'=>['auth']], function(){
-    Route::get('/dashboard', array('as'=>'Dashboard','uses'=>'HomeController@index'));
-    Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/dashboard', array('as'=>'Dashboard','uses'=>'DashboardController@index'));
     
     //-- ELECTION ROUTES --//
     Route::group(['prefix' => 'election'], function () {
@@ -31,6 +31,7 @@ Route::group(['middleware'=>['auth']], function(){
         Route::post('dashboard-stats', array('as'=>'Election.Stats','uses'=>'ElectionController@showStats'));
         Route::post('query-api', array('as'=>'QueryApi','uses'=>'ElectionController@queryResult'));
         Route::get('/reports/{id?}', array('as'=>'view.reports','uses'=>'ElectionController@reportsIndex'));
+        Route::get('/activity-logs/{id?}', array('as'=>'view.activity','uses'=>'ElectionController@activityLogIndex'));
     });
 
     //-- STATES ROUTES --//
@@ -76,6 +77,7 @@ Route::group(['middleware'=>['auth']], function(){
         Route::delete('/delete', array('as'=>'Delete.assign_roles','uses'=>'RoleController@destroy'));
     });
     /** Stop here for now **/ 
+
     //-- POLITICAL PARTIES ROUTES --//
     Route::group(['prefix' => 'political-parties'], function () {
         Route::get('/', array('as'=>'PP.View','uses'=>'PoliticalPartyController@index'));

@@ -17,11 +17,11 @@ class CreatePollingStationsTable extends Migration
             $table->increments('id');
             $table->text('slug', 191);
             $table->integer('state_id')->unsigned()->index();
-            $table->integer('constituency_id')->unsigned()->index();
+            $table->integer('constituency_id')->unsigned()->index()->nullable();
             $table->integer('lga_id')->unsigned()->index();
             $table->integer('ward_id')->unsigned()->index();
             $table->string('name');
-            $table->string('code');
+            $table->string('code')->nullable();
             $table->timestamps();
         });
     }

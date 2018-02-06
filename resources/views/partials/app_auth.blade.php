@@ -7,28 +7,26 @@
         <meta name="description" content="" />
         
         <link rel="shortcut icon" href="{{ asset('images/elect-ng-logo.png') }}" type="image/png" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
         <title>Elect-NG&trade; | Login Page </title>
-        <link href="{{ asset('css/codebase.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/login-custom.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
+        
+        <link href="{{ asset('webfont/css/materialdesignicons.min.css') }}" media="all" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('css/materialize.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/login.css') }}" rel="stylesheet">
 
         @yield('extra_style')
     </head>
-    <body style="background-image:url({{ asset('images/login.png') }});background-size:cover;background-repeat: no-repeat;">
+    <body class="body">
         @yield('login_content')
     </body>
 
     <!-- Codebase Core JS -->
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/popper.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.slimscroll.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.scrollLock.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.appear.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.countTo.min.js') }}"></script>
-    <script src="{{ asset('js/js.cookie.min.js') }}"></script>
-    <script src="{{ asset('js/codebase.js') }}"></script>
-
-    <script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
+    <script src="{{ asset('js/materialize/jquery-3.3.1.js') }}"></script>
+    <script src="{{ asset('js/materialize/materialize.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            Materialize.updateTextFields();
+        });
+    </script>
 </html>

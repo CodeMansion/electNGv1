@@ -1,5 +1,10 @@
 @extends('partials.app')
 
+@section('extra_style')
+    <link href="{{ asset('css/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
+@endsection
+
 @section('content')
     <main id="main-container">
         <!-- Page Content -->
@@ -27,7 +32,7 @@
             <div class="row">
                 <div class="col-12 col-xl-12">
                     <div class="block">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover dt-responsive" width="100%" id="sample_1">
                             <thead>
                                 <tr style="background-color: #2C3E50;color:white;">
                                     <td>S/N</td>
@@ -70,10 +75,13 @@
     </main>
 @endsection
 @section('extra_script')
-    <script>
-        jQuery(function () {
-            // Init page helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Input + Range Sliders + Tags Inputs plugins)
-            Codebase.helpers(['datepicker', 'slick', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider', 'tags-inputs']); 
-        });
-    </script>
+    <script src="{{ asset('js/datatable.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('js/datatables/datatables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('css/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
+    <!-- END PAGE LEVEL PLUGINS -->
+    <!-- BEGIN THEME GLOBAL SCRIPTS -->
+    <script src="{{ asset('js/pages/app.min.js') }}" type="text/javascript"></script>
+    <!-- END THEME GLOBAL SCRIPTS -->
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+    <script src="{{ asset('js/table-datatables-responsive.min.js') }}" type="text/javascript"></script>
 @endsection

@@ -17,7 +17,7 @@ class UserTableSeeder extends Seeder
                 'id' => 1,
                 'slug' => bin2hex(random_bytes(64)),
                 'username' => 'Administrator',
-                'email' => 'admin@codemansion.com',
+                'email' => 'dev@codemansion.org',
                 'password' => bcrypt('admin1234'),
                 'user_type_id' => 1,
                 'activated' => 1,

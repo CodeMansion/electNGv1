@@ -5,7 +5,7 @@
             Powered by: <a class="font-w600" href="#" target="_blank">CodeMansion</a>
         </div>
         <div class="float-left">
-            &copy; ElectNG 2017. <span class="js-year-copy">Version: 1.0.0</span>
+            &copy;ElectNG <?php echo date('Y',time()); ?>. <span>Version: 1.0.0</span>
         </div>
     </div>
 </footer>

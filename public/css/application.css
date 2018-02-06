@@ -1,0 +1,54 @@
+.body{
+    background-color:white;
+}
+
+nav ul li a{
+    color: white;
+}
+.icon{
+    color: white !important;
+}
+nav a{
+    color: white;
+}
+
+.btn-sq-sm {
+    width: 80px !important;
+    height: 80px !important;
+    font-size: 10px;
+}
+
+.card {
+    opacity: 0.9;
+    padding: 30px;
+}
+
+.top-header {
+    padding: 5px;
+    background-color: #39D1C3;
+    color: white;
+}
+
+.masthead {
+    padding: 20px;
+    background-image: url('../img/masthead.jpg');
+    overflow-y: auto;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-color:rgb(255, 250, 250);
+    border-bottom: 4px solid #39D1C3;
+}
+
+.content {
+    padding: 30px;
+}
+
+h2 {
+    color: #F1948A;
+}
+
+#footer {
+    padding: 20px;
+    color: white;
+    background-color: #39D1C3;
+}

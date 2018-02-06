@@ -2,6 +2,29 @@
 
 use Illuminate\Database\Schema\Blueprint;
 
+get_short_code();
+
+function get_short_code(){
+	if(!defined("_SHORT_CODE_")){
+		if(!isset($_SERVER['HTTP_HOST']) || !$_SERVER['HTTP_HOST']){
+			define("_SHORT_CODE_", "dev");
+		}else{
+			$subd = false;
+			$subd = str_replace("www.", "", $_SERVER["HTTP_HOST"]);
+			$subd = explode(".", $subd)[0];
+			$subd = str_replace("http://", "", $subd);
+			$subd = str_replace("https://", "", $subd);
+
+			if($subd){
+				define("_SHORT_CODE_", $subd);
+			}else{
+				define("_SHORT_CODE_", "dev");
+			}
+		}
+	}
+}
+
+
 function centre($id){
     $centre = \App\PollingStation::find($id);
     return strtoupper($centre['name']);
@@ -27,7 +50,31 @@ function constituency($id){
     return strtoupper($state['name']);
 }
 
-function bulkUpload($type,$file=null)
+
+function activity_logs($user=null,$ip,$action,$type,$location=null) {
+    if($type == 'api') {
+        $log = new App\ActivityLog();
+		$log->slug = bin2hex(random_bytes(64));
+        $log->user_id = null;
+        $log->location = $location;
+		$log->ip_address = $ip;
+		$log->action = $action;
+		$log->save();
+    }
+    if($type == 'app') {
+        if(isset($user) && isset($ip) && isset($action)) {
+            $log = new App\ActivityLog();
+            $log->slug = bin2hex(random_bytes(64));
+            $log->user_id = $user;
+            $log->ip_address = $ip;
+            $log->action = $action;
+            $log->save();
+        }
+    }
+}
+
+
+function bulkUpload($type,$query,$file)
 {
     if(isset($file)){
         $path = $file->getRealPath();
@@ -36,36 +83,52 @@ function bulkUpload($type,$file=null)
         //bulk upload wards under local govt
         if($type == 'ward') {
             if($data->count()){
-                \DB::table('wards')->truncate();
-                foreach ($data as $key => $value) {
-                    \DB::table("wards")->insert([
-                        'state_id' => $value->state_id, 
-                        'constituency_id' => $value->constituency_id,
-                        'lga_id' => $value->lga_id,
-                        'slug' => bin2hex(random_bytes(64)),
-                        'name' => $value->name
-                    ]);
-                }
-                if(!empty($arr)){
-                    return true;
-                }
+                if($query == 'override'){
+                    \DB::table('wards')->truncate();
+                    foreach ($data as $key => $value) {
+                        \DB::table("wards")->insert([
+                            'state_id' => $value->state_id, 
+                            'constituency_id' => $value->constituency_id,
+                            'lga_id' => $value->lga_id,
+                            'slug' => bin2hex(random_bytes(64)),
+                            'name' => $value->name
+                        ]);
+                    }
+                } 
+                if($query == 'update'){
+                    foreach ($data as $key => $value) {
+                        \DB::table("wards")->insert([
+                            'state_id' => $value->state_id, 
+                            'constituency_id' => $value->constituency_id,
+                            'lga_id' => $value->lga_id,
+                            'slug' => bin2hex(random_bytes(64)),
+                            'name' => $value->name
+                        ]);
+                    }
+                } 
             }
         }
 
-
+        //bulk upload for constituency
         if($type == "constituency") {
             if($data->count()){
-                \DB::table('constituencies')->truncate();
-                foreach ($data as $key => $value) {
-                    $arr[] = [
-                        'state_id' => $value->state_id, 
-                        'slug' => bin2hex(random_bytes(64)),
-                        'name' => $value->name
-                    ];
-                }
-                if(!empty($arr)){
-                    \DB::table('constituencies')->insert($arr);
-                    return true;
+                if($query == 'override'){
+                    \DB::table('constituencies')->truncate();
+                    foreach ($data as $key => $value) {
+                        \DB::table("constituencies")->insert([
+                            'state_id' => $value->state_id, 
+                            'slug' => bin2hex(random_bytes(64)),
+                            'name' => $value->name
+                        ]);
+                    }
+                } else {
+                    foreach ($data as $key => $value) {
+                        \DB::table("constituencies")->insert([
+                            'state_id' => $value->state_id, 
+                            'slug' => bin2hex(random_bytes(64)),
+                            'name' => $value->name
+                        ]);
+                    }
                 }
             }
         }
@@ -73,19 +136,29 @@ function bulkUpload($type,$file=null)
          //bulk upload for polling centres
          if($type == 'polling-centres') {
             if($data->count()){
-                \DB::table('polling_stations')->truncate();
-                foreach ($data as $key => $value) {
-                    $new = new \App\PollingStation();
-                    $new->slug = bin2hex(random_bytes(64));
-                    $new->state_id = $value->state_id;
-                    $new->constituency_id = $value->constituency_id;
-                    $new->lga_id = $value->lga_id;
-                    $new->ward_id = $value->ward_id;
-                    $new->name = $value->name;
-                    $new->save();
-                }
-                if(!empty($arr)){
-                    return true;
+                if($query == 'override'){
+                    \DB::table('polling_stations')->truncate();
+                    foreach ($data as $key => $value) {
+                        \DB::table("polling_stations")->insert([
+                            'slug' => bin2hex(random_bytes(64)),
+                            'state_id' => $value->state_id,
+                            'constituency_id' => $value->constituency_id,
+                            'lga_id' => $value->lga_id,
+                            'ward_id' => $value->ward_id,
+                            'name' => $value->name
+                        ]);
+                    }
+                } else {
+                    foreach ($data as $key => $value) {
+                        \DB::table("polling_stations")->insert([
+                            'slug' => bin2hex(random_bytes(64)),
+                            'state_id' => $value->state_id,
+                            'constituency_id' => $value->constituency_id,
+                            'lga_id' => $value->lga_id,
+                            'ward_id' => $value->ward_id,
+                            'name' => $value->name
+                        ]);
+                    }
                 }
             }
         }
@@ -93,17 +166,23 @@ function bulkUpload($type,$file=null)
         //bulk upload for polling centres
         if($type == 'lga') {
             if($data->count()){
-                \DB::table('lgas')->truncate();
-                foreach ($data as $key => $value) {
-                    $arr[] = [
-                        'state_id' => $value->state_id, 
-                        'constituency_id' => $value->constituency_id,
-                        'name' => $value->name
-                    ];
-                }
-                if(!empty($arr)){
-                    \DB::table('lgas')->insert($arr);
-                    return true;
+                if($query == 'override'){
+                    \DB::table('lgas')->truncate();
+                    foreach ($data as $key => $value) {
+                        \DB::table('lgas')->insert([
+                            'state_id' => $value->state_id, 
+                            'constituency_id' => $value->constituency_id,
+                            'name' => $value->name
+                        ]);
+                    }
+                } else {
+                    foreach ($data as $key => $value) {
+                        \DB::table('lgas')->insert([
+                            'state_id' => $value->state_id, 
+                            'constituency_id' => $value->constituency_id,
+                            'name' => $value->name
+                        ]);
+                    }
                 }
             }
         }
@@ -113,6 +192,20 @@ function bulkUpload($type,$file=null)
 function displayCharts($name=null,$level=null,$election=null,$state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$unit_id=null)
 {
         if($name == 'pie'){
+            if($level == 'general'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('general');
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $pieChart = \Charts::create('pie','highcharts')->title('Showing Result With Pie Chart')->labels($data)->values($value)->responsive(false);
+    
+                return $pieChart;
+            }
+
             if($level == 'state'){
                 $data = []; $value = [];$count = 0;$new = [];
                 $result = $election->get_result_summary('state',$state_id);
@@ -186,6 +279,20 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
 
         //displaying charts result for barchart
         if($name == 'bar'){
+            if($level == 'general'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('general');
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $barChart = \Charts::create('bar', 'highcharts')->title('Showing Result With Bar Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $barChart;
+            }
+
             if($level == 'state'){
                 $data = []; $value = [];$count = 0;$new = [];
                 $result = $election->get_result_summary('state',$state_id);
@@ -258,6 +365,20 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
         }
         
         if($name == 'donut') {
+            if($level == 'general'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('general');
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $donutChart = \Charts::create('donut', 'highcharts')->title('Showing Result With Donut Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $donutChart;
+            }
+
             if($level == 'state'){
                 $data = []; $value = [];$count = 0;$new = [];
                 $result = $election->get_result_summary('state',$state_id);
@@ -330,6 +451,19 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
         }
 
         if($name == 'area') {
+            if($level == 'general'){
+                $data = []; $value = [];$count = 0;$new = [];
+                $result = $election->get_result_summary('general');
+                foreach($result as $key => $v){
+                    $data[$count] = $key;
+                    $value[$count] = $v;
+                    $count++;
+                }
+                array_values($data);array_values($value);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->labels($data)->values($value)->responsive(false);
+                
+                return $areaChart;
+            }
             if($level == 'state'){
                 $data = []; $value = [];$count = 0;$new = [];
                 $result = $election->get_result_summary('state',$state_id);
@@ -339,7 +473,7 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
                     $count++;
                 }
                 array_values($data);array_values($value);
-                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->labels($data)->values($value)->responsive(false);
                 
                 return $areaChart;
             }
@@ -353,7 +487,7 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
                     $count++;
                 }
                 array_values($data);array_values($value);
-                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->labels($data)->values($value)->responsive(false);
                 
                 return $areaChart;
             }
@@ -367,7 +501,7 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
                     $count++;
                 }
                 array_values($data);array_values($value);
-                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->labels($data)->values($value)->responsive(false);
                 
                 return $areaChart;
             }
@@ -381,7 +515,7 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
                     $count++;
                 }
                 array_values($data);array_values($value);
-                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->labels($data)->values($value)->responsive(false);
                 
                 return $areaChart;
             }
@@ -395,7 +529,7 @@ function displayCharts($name=null,$level=null,$election=null,$state_id=null,$con
                     $count++;
                 }
                 array_values($data);array_values($value);
-                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->elementLabel('My nice label')->labels($data)->values($value)->responsive(false);
+                $areaChart = \Charts::create('area', 'highcharts')->title('Showing Result With Area Chart')->labels($data)->values($value)->responsive(false);
                 
                 return $areaChart;
             }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePivotActiveStateTable extends Migration
+class CreateActivityLogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreatePivotActiveStateTable extends Migration
      */
     public function up()
     {
-        Schema::create('pivot_active_state', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('state_id')->unsigned()->index();
-            $table->integer('status');
+            $table->text('slug', 191);
+            $table->integer('user')->nullable();
+            $table->string('location')->nullable();
+            $table->string('ip_address');
+            $table->string('action');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ class CreatePivotActiveStateTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pivot_active_state');
+        Schema::dropIfExists('activity_logs');
     }
 }

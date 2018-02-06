@@ -65,6 +65,9 @@
                                         <a data-toggle="modal" data-target="#assignCandidate" class="dropdown-item" href="javascript:void(0)">
                                             <i class="si si-user mr-5"></i>Election Candidate
                                         </a>
+                                        <a href="{{URL::route('view.activity',$election['slug'])}}" class="dropdown-item" href="javascript:void(0)">
+                                            <i class="si si-user mr-5"></i>Activity Logs
+                                        </a>
                                     </div>
                                 </div>
                             </div>
