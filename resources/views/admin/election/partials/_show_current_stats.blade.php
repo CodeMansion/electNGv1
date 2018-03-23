@@ -1,12 +1,12 @@
 <div class="row">
-    <div class="col-md-2">
-        <div style="overflow-y: scroll; height: 700px;">
+    <!-- <div class="col-md-2">
+        <div style="overflow-y: scroll; height: 900px;">
             @foreach($resultSummary as $key => $value)
                 <div class="col-12 ">
                     <a class="block block-link-shadow text-right" href="javascript:void(0)">
                         <div class="block-content block-content-full clearfix">
                             <div class="float-left mt-10 d-none d-sm-block">
-                                <i class="si si-bag fa-3x text-body-bg-dark"></i>
+                                <img src=<?php echo asset("uploads/party-logo/$key.jpg"); ?> width="50px" height="50px" alt="">
                             </div>
                             <div class="font-size-h3 font-w600">{{$value}}</div>
                             <div class="font-size-h4 font-w600 text-uppercase text-muted">{{$key}}</div>
@@ -15,8 +15,8 @@
                 </div>
             @endforeach
         </div>
-    </div>
-    <div class="col-md-10">
+    </div> -->
+    <div class="col-md-12">
         <div class="row">
             <div class="col-12 col-xl-12">
                 @if($latest)
@@ -36,11 +36,11 @@
                         </thead>
                         <tbody>
                             <tr style="background-color: #ECF0F1;color:black;">
-                                <td>{{ state(isset($latest->state_id)) }}</td>
-                                <td>{{ constituency(isset($latest->constituency_id)) }}</td>
-                                <td>{{ lga(isset($latest->lga_id)) }}</td>
-                                <td>{{ ward(isset($latest->ward_id)) }}</td>
-                                <td>{{ centre(isset($latest->polling_station_id)) }}</td>
+                                <td>{{ state($latest->state_id) }}</td>
+                                <td>{{ constituency($latest->constituency_id) }}</td>
+                                <td>{{ lga($latest->lga_id) }}</td>
+                                <td>{{ ward($latest->ward_id) }}</td>
+                                <td>{{ centre($latest->polling_station_id) }}</td>
                                 <td>{{ $latest->created_at}}</td>
                                 @foreach($parties as $party)
                                     @php($code = strtolower($party['code']))

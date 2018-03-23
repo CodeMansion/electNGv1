@@ -20,6 +20,7 @@ class CreatePoliticalPartiesTable extends Migration
             $table->string('code');
             $table->string('description')->default();
             $table->integer('status')->default(1);
+            $table->LongText('image')->nullable();
             $table->timestamps();
         });
     }

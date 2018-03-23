@@ -1,76 +1,111 @@
 @extends('partials.app')
 @section('extra_style')
-    <!--customize styling for student resource-->
-    <link rel="stylesheet" href="{{ asset('js/plugins/datatables/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
+    <link href="{{ asset('assets/global/plugins/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/css/components.min.css') }}" rel="stylesheet" id="style_components" type="text/css" />
 @endsection
 @section('content')
-    <main id="main-container">
-        <!-- Page Content -->
-        <div class="content container">
-            <div class="row">
-                @include('partials.notifications')
-                <div class="block block-content title-hold">
-                    <div class="col-md-12">
-                        <h3 style="margin-bottom:5px;"><i class="si si-users"></i> States and LGAs </h3><br/>
-                        <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
-                    </div>
-                </div>
+    <div class="breadcrumbs">
+        <h1>States</h1>
+        <ol class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li class="active">States</li>
+        </ol>
+    </div>
+    <!-- BEGIN SIDEBAR CONTENT LAYOUT -->
+    <div class="page-content-container">
+        <div class="page-content-row">
+            <!-- BEGIN PAGE SIDEBAR -->
+            <div class="page-sidebar">
+                <nav class="navbar" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <ul class="nav navbar-nav margin-bottom-35">
+                        <li><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                        <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                        <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> User </a></li>
+                        <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                        <li><a href="#"><i class="icon-bell"></i> Activity Logs </a></li>
+                        <li><a href="{{URL::route('State.View')}}"><i class="icon-flag"></i> States & LGAs</a></li>
+                        <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Units</a></li>
+                        <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                        <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                        <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> Settings </a></li>
+                    </ul>
+                </nav>
             </div>
-
-            <div class="row">
-                <div class="block block-content title-hold">
-                    <div class="col-6 col-xl-6">
-                        @if(count($states) < 1)
-                        <div class="danger-well">
-                            <em>There are no states on this system. </em>
+            <!-- END PAGE SIDEBAR -->
+            <div class="page-content-col">
+                @include('partials.notifications')
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <!-- BEGIN Portlet PORTLET-->
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption font-green-sharp">
+                                    <i class="icon-speech font-green-sharp"></i>
+                                    <span class="caption-subject bold uppercase">States</span>
+                                    <span class="caption-helper">Showing the list states...</span>
+                                </div>
+                                <div class="actions">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#new-election" class="btn btn-circle btn-default btn-sm"><i class="fa fa-plus"></i> Add </a>
+                                    <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                @if(count($states) < 1)
+                                    <div class="danger-well">
+                                        <em>There are no states on this system. </em>
+                                    </div>
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <table class="table table-striped table-hover" id="sample_3">
+                                                <thead>
+                                                    <tr>
+                                                        <th>S/N</th>
+                                                        <th>STATE</th>
+                                                        <th>LGA Count</th>
+                                                        <th>ACTIONS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php($index=0)
+                                                    @foreach($states as $state)
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>{{$state['name']}}</td>
+                                                            <td>{{count($state->Lgas)}}</td>
+                                                            <td>
+                                                                <div class="btn-group">
+                                                                    <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="button" data-toggle="dropdown" aria-expanded="false"> Actions<i class="fa fa-angle-down"></i></button>
+                                                                    <ul class="dropdown-menu pull-left" role="menu">
+                                                                        <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-note"></i> View LGAs </a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @php($index++)
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                        @else
-                        <table class="table table-striped js-dataTable-full">
-                            <thead>
-                                <tr>
-                                    <th width="50"><input type="checkbox" name="" value=""></th>
-                                    <th>States</th>
-                                    <th>LGA Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php($index=0)
-                                @foreach($states as $state)
-                                    <tr>
-                                        <td><input type="checkbox" name="" value=""></td>
-                                        <td class="state_{{$index}}">
-                                            <a href="">{{$state['name']}}</a><br/>
-                                            <span id="user-view{{$index}}" style="display:none;color:grey;" style="font-size: 12px;">
-                                                <a href="#"><i class="fa fa-edit"></i> Edit</a> | 
-                                                <span id="activate_{{$index}}"><a href="#"><i class="fa fa-cog"></i> Activate</a></span>
-                                                <span id="activate_{{$index}}"><a href="#"><i class="fa fa-adjust"></i> View LGA</a></span>
-                                                <input id="state_id_{{$index}}" value="{{$state['id']}}" type="hidden"> 
-                                            </span>
-                                        </td>
-                                        <td>{{count($state->Lgas)}}</td>
-                                    </tr>
-                                @php($index++)
-                                @endforeach
-                            </tbody>
-                        </table>
-                        @endif
                     </div>
-                    <div class="col-6 col-xl-6"></div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 @endsection
 @section('extra_script')
-    <script src="{{ asset('js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('js/pages/be_tables_datatables.js') }}"></script>
-    <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('assets/global/scripts/datatable.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
 
-    <script src="{{ asset('js/pages/be_forms_plugins.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $('table.table-striped tbody tr').each(function(index) {
@@ -137,4 +172,7 @@
             });   
         });    
     </script>
+@endsection
+@section('after_script')
+    <script src="{{ asset('assets/pages/scripts/table-datatables-managed.min.js') }}" type="text/javascript"></script>
 @endsection

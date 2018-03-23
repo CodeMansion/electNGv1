@@ -12,85 +12,89 @@
     {!! Charts::assets() !!}
 @endsection
 @section('content')
-    <?php $settings = \App\Preference::first(); ?>
-    <main id="main-container">
-        <!-- Page Content -->
-        <div class="content">
-            <div class="row" style="">
-                <div class="col-12 col-xl-12">
-                    @include('partials.notifications')
-                    <div class="block">
-                        <div class="block-header block-header-default">
-                            <h3 class="block-title">
-                                <i class="si si-feed"></i> {{$election['name']}} 
-                                <span class="badge badge-{{$election->status->class}}"><i class=""></i> {{$election->status->name}}</span>
-                            </h3>
-                            @can('super_admin')
-                            <form action="{{URL::route('Election.ChangeStatus')}}" method="POST">{{csrf_field()}}
-                                <input type="hidden" name="election_id" value="{{$election['slug']}}">
-                                @if($election['election_status_id'] == 1)
-                                    <input type="hidden" name="type" value="begin">
-                                    <button class="btn btn-sm btn-default create-hover" id="begin" type="submit"><i class="si si-power"></i> Start Election</button> 
-                                @elseif($election['election_status_id'] == 2)
-                                    <input type="hidden" name="type" value="end">
-                                    <button class="btn btn-sm btn-warning create-hover" id="end" type="submit"><i class="si si-lock"></i> End Election</button>
-                                @elseif($election['election_status_id'] == 3)
-                                    <button class="btn btn-sm btn-info create-hover" id="details" type="button"><i class="si si-bar-chart"></i> View Election Summary</button>
-                                @endif
-                            </form>
-                            <button class="btn btn-sm btn-secondary create-hover" type="button">
-                                <a href="{{URL::route('Election.View')}}">
-                                <i class="fa fa-dashboard"></i> Dashboard</a>
-                            </button>
-                            <div class="block-options">
-                                <div class="dropdown">
-                                    <button type="button" class="btn-block-option dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">OTHER OPTIONS</button>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="{{URL::route('SubmittedResult',$election['slug'])}}">
-                                            <i class="si si-book-open mr-5"></i>View Submitted Result
-                                        </a>
-                                        <a class="dropdown-item" href="javascript:void(0)">
-                                            <i class="si si-printer mr-5"></i>Print Result
-                                        </a>
-                                        <a class="dropdown-item" href="{{URL::route('view.reports',$election['slug'])}}">
-                                            <i class="si si-tag mr-5"></i>View Reports
-                                        </a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="{{URL::route('PasscodeView',$election['slug'])}}">
-                                            <i class="si si-tag mr-5"></i>View Election Passcode
-                                        </a>
-                                        <a class="dropdown-item" href="{{URL::route('InfographicView',$election['slug'])}}">
-                                            <i class="si si-tag mr-5"></i>View Infographics
-                                        </a>
-                                        <a data-toggle="modal" data-target="#assignCandidate" class="dropdown-item" href="javascript:void(0)">
-                                            <i class="si si-user mr-5"></i>Election Candidate
-                                        </a>
-                                        <a href="{{URL::route('view.activity',$election['slug'])}}" class="dropdown-item" href="javascript:void(0)">
-                                            <i class="si si-user mr-5"></i>Activity Logs
-                                        </a>
+<?php $settings = \App\Preference::first(); ?>
+<div class="breadcrumbs">
+        <h1>{{$election['name']}} </h1>
+        <ol class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Election</a></li>
+            <li class="active">{{$election['name']}}</li>
+        </ol>
+    </div>
+    <!-- BEGIN SIDEBAR CONTENT LAYOUT -->
+    <div class="page-content-container">
+        <div class="page-content-row">
+            <!-- BEGIN PAGE SIDEBAR -->
+            <div class="page-sidebar">
+                <nav class="navbar" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <ul class="nav navbar-nav margin-bottom-35">
+                        <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                        <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                        <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> User </a></li>
+                        <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                        <li><a href="#"><i class="icon-bell"></i> Activity Logs </a></li>
+                        <li><a href="{{URL::route('State.View')}}"><i class="icon-flag"></i> States & LGAs</a></li>
+                        <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Units</a></li>
+                        <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                        <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                        <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> icon-settings </a></li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- END PAGE SIDEBAR -->
+            <div class="page-content-col">
+                @include('partials.notifications')
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <!-- BEGIN Portlet PORTLET-->
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption font-green-sharp">
+                                    <i class="icon-speech font-green-sharp"></i>
+                                    <span class="caption-subject bold uppercase"> {{$election['name']}} </span>
+                                    <span class="caption-helper">weekly stats...</span>
+                                </div>
+                                <div class="actions">
+                                    <div class="btn-group">
+                                        <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="button" data-toggle="dropdown" aria-expanded="false"> Actions<i class="fa fa-angle-down"></i></button>
+                                        <ul class="dropdown-menu pull-left" role="menu">
+                                            <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-note"></i> Edit </a></li>
+                                            <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-trash"></i> Delete </a></li>
+                                            <li><a href="{{URL::route('SubmittedResult',$election['slug'])}}"><i class="si si-book-open mr-5"></i>View Submitted Result</a></li>
+                                            <li><a href="javascript:void(0)"><i class="si si-printer mr-5"></i>Print Result</a></li>
+                                            <li><a href="{{URL::route('view.reports',$election['slug'])}}"><i class="si si-tag mr-5"></i>View Reports</a></li>
+                                            <li><a href="{{URL::route('PasscodeView',$election['slug'])}}"><i class="si si-tag mr-5"></i>View Election Passcode </a></li>
+                                            <li><a href="{{URL::route('InfographicView',$election['slug'])}}"><i class="si si-tag mr-5"></i>View Infographics</a></li>
+                                            <li><a data-toggle="modal" data-target="#assignCandidate" href="javascript:void(0)"><i class="si si-user mr-5"></i>Election Candidate</a></li>
+                                            <li><a href="{{URL::route('view.activity',$election['slug'])}}" ><i class="si si-user mr-5"></i>Activity Logs</a></li>
+                                        </ul>
                                     </div>
+                                    <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
                                 </div>
                             </div>
-                            @endcan
+                            <div class="portlet-body">
+                                <div id="loader" style="display:none;margin-top:10px;">
+                                    <center><img src="{{asset('images/loading.gif')}}"></center>
+                                </div>
+                                <div id="stats"></div>
+                            </div>
                         </div>
-                        
                     </div>
                 </div>
             </div>
-            <div id="loader" style="display:none;margin-top:100px;">
-                <center><img src="{{asset('images/loading.gif')}}"></center>
-            </div>
-            <div id="stats"></div>
         </div>
-    </main>
+    </div>
 @endsection
 @section('extra_script')
     <script>
-        var millisec =parseInt({{ $settings->page_refresh_interval }});
+        var millisec = parseInt({{ $settings->page_refresh_interval }});
         //page refresh function for dashbboard
         function page_refresh_stats(){
-            // $('#loader').show();
-            // $("#stats").hide();
+            $('#loader').show();
+            $("#stats").hide();
             $.ajax({
                 url: "{{URL::route('Election.Stats')}}", 
                 method: "POST",
@@ -632,13 +636,6 @@
                 });
             });
         }); 
-    </script>
-    <script src="{{ asset('js/plugins/slick/slick.min.js') }}"></script>
-    <script>
-        jQuery(function () {
-            // Init page helpers (BS Datepicker + BS Colorpicker + BS Maxlength + Select2 + Masked Input + Range Sliders + Tags Inputs plugins)
-            Codebase.helpers(['datepicker', 'slick', 'colorpicker', 'maxlength', 'select2', 'masked-inputs', 'rangeslider', 'tags-inputs']); 
-        });
     </script>
 @endsection
 @section('modals')

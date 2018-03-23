@@ -2,29 +2,6 @@
 
 use Illuminate\Database\Schema\Blueprint;
 
-get_short_code();
-
-function get_short_code(){
-	if(!defined("_SHORT_CODE_")){
-		if(!isset($_SERVER['HTTP_HOST']) || !$_SERVER['HTTP_HOST']){
-			define("_SHORT_CODE_", "dev");
-		}else{
-			$subd = false;
-			$subd = str_replace("www.", "", $_SERVER["HTTP_HOST"]);
-			$subd = explode(".", $subd)[0];
-			$subd = str_replace("http://", "", $subd);
-			$subd = str_replace("https://", "", $subd);
-
-			if($subd){
-				define("_SHORT_CODE_", $subd);
-			}else{
-				define("_SHORT_CODE_", "dev");
-			}
-		}
-	}
-}
-
-
 function centre($id){
     $centre = \App\PollingStation::find($id);
     return strtoupper($centre['name']);
@@ -50,6 +27,24 @@ function constituency($id){
     return strtoupper($state['name']);
 }
 
+function convertImgToBase64($filename){
+    $type = pathinfo($filename, PATHINFO_EXTENSION);
+    $data = file_get_contents($filename);
+    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    return $base64;
+}
+
+function UploadPartyLogo($file,$data){
+    if($file){
+        //image is alredy existing with the same product id
+        $file_ext = $file->getClientOriginalExtension();
+        $file_ext = "png";
+        $file_name = $data .'.'. $file_ext;
+        $path = storage_path('/uploads/parties-logos/') . $file_name;
+        Image::make($file)->resize(80,80)->save($path);
+        return $path;
+    } 
+}
 
 function activity_logs($user=null,$ip,$action,$type,$location=null) {
     if($type == 'api') {

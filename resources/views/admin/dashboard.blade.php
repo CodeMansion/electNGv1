@@ -19,31 +19,40 @@
     </style>
 @endsection
 @section('content')
-<main id="main-container" id="dashboard">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                @include('partials.notifications')
+    <div class="breadcrumbs">
+        <h1>Election Overview</h1>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">Home</a>
+            </li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </div>
+    <!-- BEGIN SIDEBAR CONTENT LAYOUT -->
+    <div class="page-content-container">
+        <div class="page-content-row">
+            <!-- BEGIN PAGE SIDEBAR -->
+            <div class="page-sidebar">
+                <nav class="navbar" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <ul class="nav navbar-nav margin-bottom-35">
+                        <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                        <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                        <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> User </a></li>
+                        <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                        <li><a href="#"><i class="icon-bell"></i> Activity Logs </a></li>
+                        <li><a href="{{URL::route('State.View')}}"><i class="icon-flag"></i> States & LGAs</a></li>
+                        <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Units</a></li>
+                        <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                        <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                        <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> icon-settings </a></li>
+                    </ul>
+                </nav>
             </div>
-            <div class="col-12 col-xl-12" style="margin-top: 5px;">
-                <div class="block block-content">
-                    <img class="img-avatar pull-right" src="{{ asset('images/logo.png') }}" alt="">
-                    <h3 style="margin-bottom:5px;"><i class="fa fa-dashboard"></i> Welcome to ElectNG!</h3>
-                    <p style="font-size:16px;">
-                        We've put together some quick links to get you started right away.. 
-                        <strong><i class="si si-question create-hover" data-toggle="tooltip" title="Click on the quick link on the top menu to get started."></i></strong>
-                    </p>
-                    <p>
-                        | <a href="{{URL::route('Election.View')}}"><i class="si si-magnifier-add"></i> View Elections</a> |
-                        <a href="{{URL::route('Dashboard')}}"><i class="si si-book-open"></i> View Polling Stations</a> | 
-                        <a href="{{URL::route('Dashboard')}}"><i class="si si-users"></i> View Users</a> | 
-                        <a href="{{URL::route('Dashboard')}}"><i class="si si-settings"></i> Preferences</a> | 
-                    </p>
-                </div>
-            </div>
-        </div><br/>
-        
-        <table style="padding: 5px;" class="table">
+            <!-- END PAGE SIDEBAR -->
+            <div class="page-content-col">
+            <table style="padding: 5px;" class="table">
             <tr>
                 <td>
                     <center>
@@ -99,8 +108,32 @@
                 </td>
             </tr>
         </table>
-    </div><!-- END Page Content -->
-</main><!-- END Main Container -->
+            </div>
+    <!-- <div class="container">
+        <div class="row">
+            <div class="col-12">
+                @include('partials.notifications')
+            </div>
+            <div class="col-12 col-xl-12" style="margin-top: 5px;">
+                <div class="block block-content">
+                    <img class="img-avatar pull-right" src="{{ asset('images/logo.png') }}" alt="">
+                    <h3 style="margin-bottom:5px;"><i class="fa fa-dashboard"></i> Welcome to ElectNG!</h3>
+                    <p style="font-size:16px;">
+                        We've put together some quick links to get you started right away.. 
+                        <strong><i class="si si-question create-hover" data-toggle="tooltip" title="Click on the quick link on the top menu to get started."></i></strong>
+                    </p>
+                    <p>
+                        | <a href="{{URL::route('Election.View')}}"><i class="si si-magnifier-add"></i> View Elections</a> |
+                        <a href="{{URL::route('Dashboard')}}"><i class="si si-book-open"></i> View Polling Stations</a> | 
+                        <a href="{{URL::route('Dashboard')}}"><i class="si si-users"></i> View Users</a> | 
+                        <a href="{{URL::route('Dashboard')}}"><i class="si si-settings"></i> Preferences</a> | 
+                    </p>
+                </div>
+            </div>
+        </div><br/>
+        
+        
+    </div>END Page Content -->
 @endsection
 @section('extra_script')
     <script src="{{ asset('js/plugins/slick/slick.min.js') }}"></script>

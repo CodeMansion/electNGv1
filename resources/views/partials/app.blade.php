@@ -7,45 +7,65 @@
         <meta name="description" content="" />
         <link rel="shortcut icon" href="{{ asset('images/elect-ng-logo.png') }}" type="image/png" />
 
-        <title>Elect-NG&trade; | Dashboard </title>
+        <title>ElectNG&trade; | Dashboard </title>
         
-        <link href="{{ asset('css/codebase.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
-        <link href="{{ asset('js/plugins/sweetalert/sweetalert.css') }}" rel="stylesheet">
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/global/plugins/font-awesome/css/font-awesome.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/global/plugins/simple-line-icons/simple-line-icons.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/global/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css') }}" rel="stylesheet" type="text/css" />
+        
+        <link href="{{ asset('assets/global/css/components-md.min.css') }}" rel="stylesheet" id="style_components" type="text/css" />
+        <link href="{{ asset('assets/global/css/plugins-md.min.css') }}" rel="stylesheet" type="text/css" />
+        
+        <link href="{{ asset('assets/layouts/layout5/css/layout.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('assets/layouts/layout5/css/custom.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('css/custom.css') }}" rel="stylesheet" type="text/css" />
         @yield('extra_style')
     </head>
-    <body>
-        <div id="page-container" class=" sidebar-mini sidebar-inverse side-scroll side-scroll page-header-fixed page-header-inverse">
-            <!-- top menu content -->
-            <!--  -->
-            <!-- side menu content -->
-            @include('partials.side-nav')
-            <!-- header content -->
+    <body class="page-header-fixed page-sidebar-closed-hide-logo">
+        <div class="wrapper">
             @include('partials.header')
-
-            <!-- main page contents -->
-            @yield('content')
-
-            <!-- footer content -->
-            @include('partials.footer')
-
-            <!--modals inclusion -->
-            @yield('modals')
+            <!-- <div class="clearfix"> </div> -->
+                <!-- BEGIN CONTAINER -->
+                <div class="container-fluid">
+                    <div class="page-content">
+                        
+                        @yield('content')
+                    </div>
+                    @include('partials.footer')
+                </div>
+                
+                @yield('modals')
         </div>
 
-        <!-- Codebase Core JS -->
-        <script src="{{ asset('js/jquery.min.js') }}"></script>
-        <script src="{{ asset('js/popper.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/jquery.slimscroll.min.js') }}"></script>
-        <script src="{{ asset('js/jquery.scrollLock.min.js') }}"></script>
-        <script src="{{ asset('js/jquery.appear.min.js') }}"></script>
-        <script src="{{ asset('js/jquery.countTo.min.js') }}"></script>
-        <script src="{{ asset('js/js.cookie.min.js') }}"></script>
-        <script src="{{ asset('js/codebase.js') }}"></script>
+        <script src="{{ asset('assets/global/plugins/jquery.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/bootstrap/js/bootstrap.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/js.cookie.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/jquery.blockui.min.js') }}" type="text/javascript"></script>
+        <!-- END CORE PLUGINS -->
+        
+        <!-- BEGIN PAGE LEVEL PLUGINS -->
+        <script src="{{ asset('assets/global/plugins/moment.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/morris/morris.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/morris/raphael-min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/counterup/jquery.waypoints.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/global/plugins/counterup/jquery.counterup.min.js') }}" type="text/javascript"></script>
 
-        <script src="{{ asset('js/loadingoverlay.min.js') }}"></script>
-        <script src="{{ asset('js/plugins/sweetalert/sweetalert.min.js') }}"></script>
+        @yield('extra_script')
+
+        <!-- END PAGE LEVEL PLUGINS -->
+        <script src="{{ asset('assets/global/scripts/app.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('js/utilities.js') }}" type="text/javascript"></script>
+
+        @yield('after_script')
+        
+        <script src="{{ asset('assets/pages/scripts/dashboard.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/layouts/layout/scripts/layout.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/layouts/layout/scripts/demo.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/layouts/global/scripts/quick-sidebar.min.js') }}" type="text/javascript"></script>
+        <script src="{{ asset('assets/layouts/global/scripts/quick-nav.min.js') }}" type="text/javascript"></script>
 
         <!---notification messages---->
         <script src="{{ asset('js/notify.min.js') }}"></script>
@@ -81,9 +101,6 @@
                 });
             });
         </script>
-
-        <!-- extra javascript plugins included here -->
-        @yield('extra_script')
     </body>
 </html>
     

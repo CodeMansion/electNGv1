@@ -44,8 +44,7 @@ class Election extends Model
     }
 
     public function fnPollingUnits(){
-        $polling_list = \DB::table("election_onetime_passwords")
-                ->where("election_onetime_passwords.election_id", "=", $this->id);
+        $polling_list = \DB::table("election_onetime_passwords")->where("election_id", "=", $this->id);
 
         return $polling_list;
     }
