@@ -13,12 +13,17 @@ class CreateElectionPartyTable extends Migration
      */
     public function up()
     {
-        Schema::create('pivot_election_parties', function (Blueprint $table) {
+        Schema::create('election_parties', function (Blueprint $table) {
+            $table->engine = "InnoDB";
             $table->increments('id');
             $table->integer('election_id')->unsigned()->index();
             $table->integer('political_party_id')->unsigned()->index();
-            $table->integer('status')->default(1);
+            $table->boolean('is_star_party')->default(false);
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
+
+            $table->foreign('election_id')->references('id')->on('elections');
+            $table->foreign('political_party_id')->references('id')->on('political_parties');
         });
     }
 

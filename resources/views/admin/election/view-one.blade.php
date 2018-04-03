@@ -1,25 +1,24 @@
 @extends('partials.app')
 @section('extra_style')
     <!-- customize styling for student resource-->
-    <link rel="stylesheet" href="{{ asset('js/plugins/slick/slick.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/slick/slick-theme.min.css') }}">
+    <link href="{{ asset('assets/global/plugins/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/css/components.min.css') }}" rel="stylesheet" id="style_components" type="text/css" />
     <style>
         .content .block-content label {
             margin-right: 10px;
             font-size: 15px;
         }
     </style>
-    {!! Charts::assets() !!}
 @endsection
 @section('content')
-<?php $settings = \App\Preference::first(); ?>
 <div class="breadcrumbs">
-        <h1>{{$election['name']}} </h1>
+        <h1>{{ $election['name'] }} </h1>
         <ol class="breadcrumb">
             <li><a href="#">Home</a></li>
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Election</a></li>
-            <li class="active">{{$election['name']}}</li>
+            <li class="active">{{ $election['name'] }}</li>
         </ol>
     </div>
     <!-- BEGIN SIDEBAR CONTENT LAYOUT -->
@@ -28,19 +27,15 @@
             <!-- BEGIN PAGE SIDEBAR -->
             <div class="page-sidebar">
                 <nav class="navbar" role="navigation">
-                    <!-- Brand and toggle get grouped for better mobile display -->
-                    <!-- Collect the nav links, forms, and other content for toggling -->
                     <ul class="nav navbar-nav margin-bottom-35">
-                        <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
-                        <li><a href="#"><i class="icon-note "></i> Reports </a></li>
-                        <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> User </a></li>
-                        <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
-                        <li><a href="#"><i class="icon-bell"></i> Activity Logs </a></li>
-                        <li><a href="{{URL::route('State.View')}}"><i class="icon-flag"></i> States & LGAs</a></li>
-                        <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Units</a></li>
-                        <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
-                        <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
-                        <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> icon-settings </a></li>
+                        <li class="active"><a href="{{ URL::route('Election.ViewOne',$election['slug']) }}"><i class="icon-home"></i> Home </a></li>
+                        <li><a href="{{ URL::route('view.reports', $election['slug']) }}"><i class="icon-note "></i> View Reports </a></li>
+                        <li><a href="{{URL::route('winMetric',$election['slug'])}}"><i class="icon-flag"></i> Win Metrics </a></li>
+                        <li><a href="{{ URL::route('Election.broadsheet', $election['slug']) }}"><i class="icon-trophy "></i> Broadsheet </a></li>
+                        <li><a href="{{ URL::route('view.activity',$election['slug']) }}"><i class="icon-bell"></i> Activity Logs </a></li>
+                        <li><a href="{{ URL::route('PasscodeView',$election['slug']) }}"><i class="icon-user"></i> Passcodes</a></li>
+                        <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Party Agents</a></li>
+                        <li><a href="{{ URL::route('SubmittedResult',$election['slug']) }}"><i class="icon-bell"></i> View Result </a></li>
                     </ul>
                 </nav>
             </div>
@@ -55,31 +50,64 @@
                                 <div class="caption font-green-sharp">
                                     <i class="icon-speech font-green-sharp"></i>
                                     <span class="caption-subject bold uppercase"> {{$election['name']}} </span>
-                                    <span class="caption-helper">weekly stats...</span>
+                                    <span class="caption-helper">Displaying list of contesting parties ...</span>
                                 </div>
-                                <div class="actions">
-                                    <div class="btn-group">
-                                        <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="button" data-toggle="dropdown" aria-expanded="false"> Actions<i class="fa fa-angle-down"></i></button>
-                                        <ul class="dropdown-menu pull-left" role="menu">
-                                            <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-note"></i> Edit </a></li>
-                                            <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-trash"></i> Delete </a></li>
-                                            <li><a href="{{URL::route('SubmittedResult',$election['slug'])}}"><i class="si si-book-open mr-5"></i>View Submitted Result</a></li>
-                                            <li><a href="javascript:void(0)"><i class="si si-printer mr-5"></i>Print Result</a></li>
-                                            <li><a href="{{URL::route('view.reports',$election['slug'])}}"><i class="si si-tag mr-5"></i>View Reports</a></li>
-                                            <li><a href="{{URL::route('PasscodeView',$election['slug'])}}"><i class="si si-tag mr-5"></i>View Election Passcode </a></li>
-                                            <li><a href="{{URL::route('InfographicView',$election['slug'])}}"><i class="si si-tag mr-5"></i>View Infographics</a></li>
-                                            <li><a data-toggle="modal" data-target="#assignCandidate" href="javascript:void(0)"><i class="si si-user mr-5"></i>Election Candidate</a></li>
-                                            <li><a href="{{URL::route('view.activity',$election['slug'])}}" ><i class="si si-user mr-5"></i>Activity Logs</a></li>
-                                        </ul>
-                                    </div>
-                                    <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
-                                </div>
+                                <div class="actions"></div>
                             </div>
                             <div class="portlet-body">
-                                <div id="loader" style="display:none;margin-top:10px;">
-                                    <center><img src="{{asset('images/loading.gif')}}"></center>
-                                </div>
-                                <div id="stats"></div>
+                                @if(count($politicalParties) < 1)
+                                    <div class="alert alert-danger">
+                                        <em>There are political parties in this election </em>
+                                    </div>
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <table class="table table-striped table-hover political_parties" id="sample_3">
+                                                <thead>
+                                                    <tr>
+                                                        <th>LOGO</th>
+                                                        <th>CODE</th>
+                                                        <th>NAME</th>
+                                                        <th></th>
+                                                        <th>ACTIONS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php($index=0)
+                                                    @foreach($politicalParties as $party)
+                                                    @php($star = \App\ElectionParty::where('election_id',$election['id'])->where('political_party_id',$party['id'])->first())
+                                                        <tr>
+                                                            <td><img src=<?php echo asset("uploads/party-logo/$party->code.jpg"); ?> width="50px" height="50px" alt=""></td>
+                                                            <td>{{ $party['code'] }}</td>
+                                                            <td>{{ $party['name'] }}</td>
+                                                            <th>
+                                                                @if($star['is_star_party'] == true)
+                                                                    <img src="{{ asset('images/star.png')}}" height="30" width="30" />
+                                                                @endif 
+                                                            </th>
+                                                            <td>
+                                                                <div class="btn-group">
+                                                                    <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="button_{{ $index }}" data-toggle="dropdown" aria-expanded="false"> Actions<i class="fa fa-angle-down"></i></button>
+                                                                    <ul class="dropdown-menu pull-left" role="menu">
+                                                                        @if($election['election_status_id'] == 2)
+                                                                            <li><a href="{{ URL::route('Election.ViewOne') }}"><i class="icon-note"></i> View Party Result </a></li>
+                                                                        @endif
+                                                                        <li><a href="#" id="mark_star_{{ $index }}"><i class="icon-star"></i> Make as star </a></li>
+                                                                        <input type="hidden" id="political_party_id_{{ $index }}" value="{{ $party['id'] }}" />
+                                                                        @if($election['election_status_id'] == 1)
+                                                                            <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-trash"></i> Remove  </a></li>
+                                                                        @endif
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @php($index++)
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -89,555 +117,41 @@
     </div>
 @endsection
 @section('extra_script')
+    <script src="{{ asset('assets/global/scripts/datatable.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
     <script>
-        var millisec = parseInt({{ $settings->page_refresh_interval }});
-        //page refresh function for dashbboard
-        function page_refresh_stats(){
-            $('#loader').show();
-            $("#stats").hide();
-            $.ajax({
-                url: "{{URL::route('Election.Stats')}}", 
-                method: "POST",
-                data: {
-                    '_token': "{{csrf_token()}}",
-                    'slug': "{{$election['slug']}}"
-                },
-                success: function(data) {
-                    $("#loader").hide();
-                    $('#stats').show();
-                    $('#stats').html(data);
-                    // location.reload();
-                },
-                complete: function() {}
-            });
-            setTimeout(page_refresh_stats, millisec);
-        }
-
         $(document).ready(function() {
-            //initializing page refresh function
-            page_refresh_stats();
+            $('body').find('.table.table-striped.table-hover.political_parties tbody tr').each(function(index) {
+                $("#mark_star_" + index).on("click", function() {
+                    var party_id = $("#political_party_id_" + index).val();
+                    $("#button_" + index).attr('disabled', true);
+                    $("#button_" + index).html("<i class='fa fa-spinner fa-spin'></i> Processing ...");
 
-            //getting the election type
-            var election_type = parseInt({{$election->election_type_id}});
-            
-            //initializing views
-
-            //for local govt election
-            $("#view-by-lga").hide();
-            $("#view-by-ward-local").hide();
-            $("#view-by-unit-local").hide();
-
-            //for senatorial election
-            $("#view-by-lga-senatorial").hide();
-            $("#view-by-ward-senatorial").hide();
-            $("#view-by-unit-senatorial").hide();
-
-            //for governorship election
-            $("#view-by-const-first-governor").hide();
-            $("#view-by-const-second-governor").hide();
-            $("#view-by-ward-governor").hide();
-            $("#view-by-unit-governor").hide();
-            $("#refresh").hide();
-
-            //executing processes based on election type
-            if(election_type == 1) {
-
-            } 
-
-
-            //queries for governorship election
-            if(election_type == 2) {
-                $("input[name=type][type=radio]").on("change", function() {
-                    if($(this).val() == 'constituency'){
-                        $("#view-by-const-second-governor").hide();
-                        $("#view-by-ward-governor").hide();
-                        $("#view-by-unit-governor").hide();
-                        $("#view-by-const-first-governor").show();;
-                    }
-
-                    if($(this).val() == 'lga'){
-                        $("#view-by-const-first-governor").hide();
-                        $("#view-by-unit-senatorial").hide();
-                        $("#view-by-unit-governor").hide();
-                        $("#view-by-const-second-governor").show();
-                    }
-
-                    if($(this).val() == 'ward'){
-                        $("#view-by-const-first-governor").hide();
-                        $("#view-by-const-second-governor").hide();
-                        $("#view-by-unit-governor").hide();
-                        $("#view-by-ward-governor").show();
-                    }
-
-                    if($(this).val() == 'station'){
-                        $("#view-by-const-first-governor").hide();
-                        $("#view-by-const-second-governor").hide();
-                        $("#view-by-ward-governor").hide();
-                        $("#view-by-unit-governor").show();
-                    }
-
-                    if($(this).val() == 'general'){
-                        $("#view-by-const-first-governor").hide();
-                        $("#view-by-const-second-governor").hide();
-                        $("#view-by-ward-governor").hide();
-                        $("#view-by-unit-governor").hide();
-                        location.reload();
-                    }
-                });
-
-                //query result by constituency
-                $("select[name=const_id_first_governor]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
                     $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
+                        url: "{{ URL::route('MarkStar') }}", 
                         method: "POST",
                         data: {
-                            '_token': "{{csrf_token()}}",
-                            'constituency_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "constituency-result"
+                            '_token': "{{ csrf_token() }}",
+                            'party_id': party_id,
+                            'election_id': "{{ $election['id'] }}"
                         },
                         success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                //query result by lga
-                $("select[name=lga_id_first_governor]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'constituency_id': $("select[name=const_id_second_governor]").val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "lga-result-gov"
+                            $("#button_" + index).attr('disabled', false);
+                            $("#button_" + index).html(" Action <i class='fa fa-angle-down'></i>");
+                            alert("Marked Successfully!")
+                            location.reload();
                         },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
+                        error: function() {
+                            $("#button_" + index).attr('disabled', false);
+                            $("#button_" + index).html(" Try Again <i class='fa fa-angle-down'></i>");
+                            alert("Error");
                         }
                     });
-                });
-
-                 //query result by ward
-                $("select[name=ward_id_first_governor]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'constituency_id': $("select[name=const_id_third_governor]").val(),
-                            'lga_id': $("select[name=lga_id_second_governor]").val(),
-                            'ward_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "ward-result-governor"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                //query result by polling stations
-                $("select[name=unit_id_governor]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'unit_id': $(this).val(),
-                            'constituency_id': $("select[name=const_id_fouth_governor]").val(),
-                            'lga_id': $("select[name=lga_id_fouth_governor]").val(),
-                            'ward_id': $("select[name=ward_id_second_governor]").val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "unit-result-governor"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=const_id_third_governor]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'constituency_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showLgas"
-                        },
-                        success: function(data) {
-                            $('select[name=lga_id_second_governor]').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=const_id_fouth_governor]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'constituency_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showLgas"
-                        },
-                        success: function(data) {
-                            $('select[name=lga_id_fouth_governor]').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=const_id_second_governor]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'constituency_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showLgas"
-                        },
-                        success: function(data) {
-                            $('select[name=lga_id_first_governor]').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=lga_id_second_governor]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showWards"
-                        },
-                        success: function(data) {
-                            $('select[name=ward_id_first_governor').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=lga_id_fouth_governor]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showWards"
-                        },
-                        success: function(data) {
-                            $('select[name=ward_id_second_governor').html(data);
-                        }
-                    });
-                });
-                
-
-                $("select[name=lga_id_second_senatorial]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showWards"
-                        },
-                        success: function(data) {
-                            $('select[name=ward_id_senatorial]').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=ward_id_second_governor]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'ward_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showUnits"
-                        },
-                        success: function(data) {
-                            $('select[name=unit_id_governor]').html(data);
-                        }
-                    });
-                });
-            } 
-
-
-            //queries for senatorial election
-            if(election_type == 3) {
-                $("input[name=type][type=radio]").on("change", function() {
-                    if($(this).val() == 'lga'){
-                        $("#view-by-ward-senatorial").hide();
-                        $("#view-by-unit-senatorial").hide();
-                        $("#view-by-lga-senatorial").show();
-                    }
-
-                    if($(this).val() == 'ward'){
-                        $("#view-by-lga-senatorial").hide();
-                        $("#view-by-unit-senatorial").hide();
-                        $("#view-by-ward-senatorial").show();
-                    }
-
-                    if($(this).val() == 'unit'){
-                        $("#view-by-lga-senatorial").hide();
-                        $("#view-by-ward-senatorial").hide();
-                        $("#view-by-unit-senatorial").show();
-                    }
-
-                    if($(this).val() == 'general'){
-                        $("#view-by-lga-senatorial").hide();
-                        $("#view-by-ward-senatorial").hide();
-                        $("#view-by-unit-senatorial").hide();
-                        location.reload();
-                    }
-                });
-
-                //query result by lga
-                $("select[name=lga_id_first_senatorial]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "lga-result"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                 //query result by ward
-                $("select[name=ward_id_senatorial]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'ward_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "ward-result"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                //query result by polling stations
-                $("select[name=unit_id_senatorial]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'unit_id': $(this).val(),
-                            'ward_id': $("select[name=ward_id_show_senatorial]").val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "unit-result"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=lga_id_show_senatorial]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showWards"
-                        },
-                        success: function(data) {
-                            $('select[name=ward_id_show_senatorial]').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=lga_id_second_senatorial]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'lga_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showWards"
-                        },
-                        success: function(data) {
-                            $('select[name=ward_id_senatorial]').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=ward_id_show_senatorial]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'ward_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showUnits"
-                        },
-                        success: function(data) {
-                            $('select[name=unit_id_senatorial]').html(data);
-                        }
-                    });
-                });
-            } 
-
-            //queries for local government election
-            if(election_type == 4) {
-                $("input[name=type][type=radio]").on("change", function() {
-                    if($(this).val() == 'ward'){
-                        $("#view-by-unit-local").hide();
-                        $("#view-by-ward-local").show();
-                    }
-
-                    if($(this).val() == 'station'){
-                        $("#view-by-ward-local").hide();
-                        $("#view-by-unit-local").show();
-                    }
-
-                    if($(this).val() == 'general'){
-                        $("#view-by-ward").hide();
-                        $("#view-by-unit").hide();
-                        location.reload();
-                    }
-                });
-
-                //query result by ward
-                $("select[name=ward_id_local]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'ward_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "ward-result"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                //query result by polling stations
-                $("select[name=unit_id_local]").on("change", function() {
-                    $('#stats').hide();
-                    $("#loader").show();
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'unit_id': $(this).val(),
-                            'ward_id': $("select[name=ward_id_local]").val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "unit-result"
-                        },
-                        success: function(data) {
-                            $("#loader").hide();
-                            $('#stats').show();
-                            $('#stats').html(data);
-                        }
-                    });
-                });
-
-                $("select[name=ward_id_show]").on("change", function() {
-                    $.ajax({
-                        url: "{{URL::route('QueryApi')}}", 
-                        method: "POST",
-                        data: {
-                            '_token': "{{csrf_token()}}",
-                            'ward_id': $(this).val(),
-                            'slug': "{{$election['slug']}}",
-                            'req': "showUnits"
-                        },
-                        success: function(data) {
-                            $('select[name=unit_id_local]').html(data);
-                        }
-                    });
-                });
-            }
-
-            //assigning of candidate
-            $("#assign-btn").on("click", function() {
-                $.LoadingOverlay("show");
-                var user_id = $("select[name=user_id]").val();
-                $.ajax({
-                    url: "{{URL::route('ElectionAjax')}}",
-                    method: "POST",
-                    data:{
-                        '_token': "{{csrf_token()}}",
-                        'user_id': user_id,
-                        'slug': "{{$election['slug']}}",
-                        'req': "assignCandidate"
-                    },
-                    success: function(data){
-                        swal("Completed!","Candidate has been assigned to election successfully.", "success");
-                        location.reload();
-                    },
-                    error: function(rst){
-                        $.LoadingOverlay("hide");
-                        swal("Oops! Error","An Error Occured!", "error");
-                    }
                 });
             });
-        }); 
+        });
     </script>
 @endsection
 @section('modals')
-    @include('admin.election.modals._assign_candidate')
 @endsection

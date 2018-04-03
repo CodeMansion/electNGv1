@@ -55,7 +55,7 @@
                     <!-- BEGIN USER PROFILE -->
                     <div class="btn-group-img btn-group">
                         <button type="button" class="btn btn-sm md-skip dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
-                            <span>Hi, {{\Auth::user()->username}} </span>
+                            <span>Hi, {{\Auth::user()->surname}} {{\Auth::user()->other_names}}</span>
                             <img src="../assets/layouts/layout5/img/avatar1.jpg" alt=""> </button>
                         <ul class="dropdown-menu-v2" role="menu">
                             <li>

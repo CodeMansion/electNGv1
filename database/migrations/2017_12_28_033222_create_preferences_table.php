@@ -15,10 +15,17 @@ class CreatePreferencesTable extends Migration
     {
         Schema::create('preferences', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('page_refresh');
-            $table->integer('page_refresh_interval');
-            $table->integer('sound_notification');
-            $table->integer('party_counter');
+            $table->string('host');
+            $table->string('username');
+            $table->string('password');
+            $table->string('encryption');
+            $table->integer('port');
+            $table->boolean('enable_page_refresh')->default(true);
+            $table->boolean('enable_report_image')->default(false);
+            $table->boolean('enable_integrity_check')->default(true);
+            $table->boolean('enable_ward_result')->default(false);
+            $table->boolean('enable_result_override')->default(false);
+            $table->boolean('enable_sound_notification')->default(true);
             $table->timestamps();
         });
     }

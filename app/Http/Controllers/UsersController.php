@@ -8,6 +8,10 @@ use App\User;
 use App\UserProfile;
 use App\UserType;
 use App\Role;
+use App\UserCategory;
+use App\Gender;
+use App\State;
+use Validator;
 
 class UsersController extends Controller
 {
@@ -19,21 +23,38 @@ class UsersController extends Controller
     public function index()
     {
         //this is geeting everything abut the user and passing it to the view
-        $data['userTypes'] = UserType::all();
+        $data['categories'] = UserCategory::all();
         $data['users'] = User::all();
         $data['roles'] = Role::all();
+        $data['genders'] = Gender::all();
+        $data['states'] = State::all();
 
         return view('admin.users.index')->with($data);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+
+    protected function insertValidator(array $data) {
+        $niceMsg = [
+            'surname'       => 'Surname',
+            'category_id'   => 'User category',
+            'gender_id'     => 'Gender',
+            'state_id'      => 'State of origin',
+            'email'         => 'Email Address',
+            'telephone'     => 'Telephone number',
+            'role_id'       => 'User role',
+        ];
+
+        return Validator::make($data, [
+            'surname'               => 'bail|required',
+            'other_names'           => 'bail|required',
+            'category_id'           => 'bail|required',
+            'gender_id'             => 'bail|required',
+            'state_id'              => 'bail|required',
+            'role_id'               => 'bail|required',
+            'email'                 => 'bail|required|email',
+            'telephone'             => 'bail|required|min:11|max:11',
+            'address'               => 'bail|required',
+        ], $niceMsg);
     }
 
     /**
@@ -45,55 +66,67 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         $data = $request->except('_token');
-        
-        //Avoiding saving users with the same email addresses
-        if(User::hasEmail($data['email']) == true){
-            return redirect()->back()->with('error','Sorry a user with this email address already exist. Try again.');
+        if(User::hasEmail($data['email']) || UserProfile::hasEmail($data['email'])){
+            return $response = [
+                "msg"   => "This email address already exist",
+                "type"  => "false"
+            ];
         }
 
-        if($data['req'] == 'newUser'){
+        $validate = $this->insertValidator($request->except('_token'));
+        if($validate->fails()) {
+            return $response = [
+                'msg'   => $validate->errors(),
+                'type'  => 'false'
+            ];
+        }
 
-            \DB::beginTransaction();
-            try {
-                //saving new user and login datails
-                $user = new User();
-                $user->slug = bin2hex(random_bytes(64));
-                $user->user_type_id = $data['user_type_id'];
-                $user->username = $data['username'];
-                $user->email = $data['email'];
-                $user->password = '12345678';
-                $user->activated = 1;
-                $user->user_status_id = 1;
-                $user->save();
+        \DB::beginTransaction();
+        try {
 
-                //storing user profile
-                $profile = new UserProfile();
-                $profile->slug = bin2hex(random_bytes(64));
-                $profile->user_id = $user->id;
-                $profile->first_name = $data['first_name'];
-                $profile->last_name = $data['last_name'];
-                $profile->phone = $data['phone'];
-                $profile->res_address = $data['res_address'];
-                $profile->save();
+            $user = \DB::table("users")->insertGetId([
+                'slug'              => bin2hex(random_bytes(64)),
+                'user_category_id'  => $data['category_id'],
+                'surname'           => ucfirst($data['surname']),
+                'other_names'       => ucwords($data['other_names']),
+                'email'             => $data['email'],
+                'password'          => bcrypt('Pass1234@'),
+            ]);
 
-                //assigning role to new user
-                if(isset($data['role_id'])){
-                    $update = User::find($user->id)
-                    ->roles()->save(
-                        Role::whereId($data['role_id'])->firstOrFail()
-                    );
-                } else {
-                    //assigning default role to user
-                    $user->assignRole(2);
-                }
+            $profile = \DB::table("user_profiles")->insert([
+                'slug'              => bin2hex(random_bytes(64)),
+                'last_name'         => $data['surname'],
+                'other_names'       => $data['other_names'],
+                'email'             => $data['email'],
+                'telephone'         => $data['telephone'],
+                'gender_id'         => $data['gender_id'],
+                'user_id'           => $user,
+                'state_id'          => $data['state_id'],
+                'address'           => $data['address'],
+                'status'            => 1
+            ]);
 
-                \DB::commit();
-                return redirect()->back()->with("success","User created successfully.");
-
-            } catch(Exception $e) {
-                \DB::rollback();
-                return redirect()->back()->with("error","Failed new to create user.");
+            if(isset($data['role_id'])){
+                $update = User::find($user)
+                ->roles()->save(
+                    Role::whereId($data['role_id'])->firstOrFail()
+                );
+            } else {
+                $update = User::find($user)->assignRole(2);
             }
+
+            \DB::commit();
+            return $response = [
+                'msg'   => 'Created Successfully',
+                'type'  => 'true'
+            ];
+
+        } catch(Exception $e) {
+            \DB::rollback();
+            return $response = [
+                'msg'   => $e->getMessage(),
+                'type'  => 'false'
+            ];
         }
     }
 

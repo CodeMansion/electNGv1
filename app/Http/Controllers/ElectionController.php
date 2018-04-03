@@ -11,14 +11,15 @@ use App\State;
 use App\Lga;
 use App\Ward;
 use App\PollingStation;
-use App\ElectionResultIndex;
 use App\User;
 use App\ElectionType;
 use App\Constituency;
-use App\ElectionOnetimePassword;
-use App\PivotElectionReport;
-use App\PivotElectionParty;
+use App\ElectionPasscode;
+use App\ElectionReport;
 use App\ActivityLog;
+use App\Preference;
+use App\ElectionParty;
+use App\ElectionEntry;
 
 use App\Mail\SendPasscode;
 
@@ -26,12 +27,13 @@ use Charts;
 use Mail;
 use DB;
 use Artisan;
+use Session;
 
 class ElectionController extends Controller
 {
     public function index()
     {
-        $data['elections'] = Election::all();
+        $data['userElections'] = \Auth::user()->elections()->get();
         $data['states'] = State::all();
         $data['politicalParties'] = PoliticalParty::orderBy('code','ASC')->get();
         $data['electionTypes'] = ElectionType::all();
@@ -39,198 +41,130 @@ class ElectionController extends Controller
         return view('admin.election.index')->with($data);
     }
 
+
     public function store(Request $request)
     {   
-        #TODO:: Processes for this function
-
-        //1. Check for election name existance
-        //2. Create new election with election details
-        //3. Create election parties
-        //4. Create election index to store election code
-        //5. Get PUs based on election type
-        //6. Populate election PUs record
-        //7. Create a new table for the result
-        //8. Populate the table with PU records
-        //9. Generate OTP for election
-        
         $data = $request->except('_token');
-        $parties = $data['party'];	
-        $ElectionCode = strtolower(str_random(4));
-        
+        $parties = $data['party'];
 
-        //Checking for election name existence
         if(Election::isElectionExists($data['name']) == true){
             return $response = [
-                'msg' => "This election already exist. Try again!",
-                'type' => "false"
+                'msg'   => "This election already exist. Try again!",
+                'type'  => "false"
             ];
         }
 
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
-            ini_set('max_execution_time', 0);//process script with unlimited time
+            ini_set('max_execution_time', 0);
             $time_start = microtime(true);
 
-            //creating a new election
-            $election = \App\Election::insertGetId([
-                'name' => $data['name'],
-                'slug' => bin2hex(random_bytes(64)),
-                'description' => ($data['description']) ? $data['description'] : null,
-                'start_date' => date("y-m-d",strtotime($data['start_date'])),
-                'end_date' => date("y-m-d",strtotime($data['end_date'])),
-                'election_status_id' => 2,
-                'election_type_id' => $data['type']
+            $election = Election::insertGetId([
+                'name'                  => $data['name'],
+                'slug'                  => bin2hex(random_bytes(64)),
+                'description'           => ($data['description']) ? $data['description'] : null,
+                'start_date'            => date("y-m-d",strtotime($data['start_date'])),
+                'end_date'              => date("y-m-d",strtotime($data['end_date'])),
+                'election_status_id'    => 1,
+                'election_type_id'      => $data['type']
             ]);
-           
-            //creating election parties
-            foreach($parties as $key=>$v){
-                $p = DB::table("pivot_election_parties")->insert([
-                    'election_id' => $election,
-                    'political_party_id' => $v
-                ]);
-            }		
-            
-            //presidential election
-            if($data['req'] == 'presidential'){
-                //creating election polling units
-                DB::table("election_result_indices")->insert([
-                    "election_id" =>$election, 
-                    "election_code" => $ElectionCode
-                ]);
-                
-                //creating election polling units
-                $C = \App\PollingStation::all();
 
-            } elseif($data['req'] == 'governorship') { //governshiop elections
+            if($data['req'] == 'presidential') {
+                $polling_stations = PollingStation::all();
+            } elseif($data['req'] == 'governorship') { 
                 $state_id = $data['state_id'];
-        
-                // Create a new entry in the assessments index
-                DB::table("election_result_indices")->insert([
-                    "election_id" =>$election, 
-                    "election_code" => $ElectionCode
-                ]);
-
-                //creating election polling units
-                $C = \App\PollingStation::where('state_id','=',$state_id)->get();
-            
-            } elseif($data['req'] == 'senatorial') {//senetorial election
-                
+                $polling_stations = PollingStation::where('state_id','=', $state_id)->get();
+            } elseif($data['req'] == 'senatorial') {
                 $state_id = $data['state_id'];
                 $constituency_id = $data['constituency_id'];
+                $polling_stations = PollingStation::where([
+                    'state_id'          => $state_id,
+                    'constituency_id'   => $constituency_id
+                ])->get();
 
-                // Create a new entry in the assessments index
-                DB::table("election_result_indices")->insert([
-                    "election_id" =>$election, 
-                    "election_code" => $ElectionCode
-                ]);
-
-                //creating election polling units
-                $C = \App\PollingStation::where('state_id','=',$state_id)->where('constituency_id','=',$constituency_id)->get();
-            
-            } elseif($data['req'] == 'local') {//local government election 
+            } elseif($data['req'] == 'local') {
                 $state_id = $data['state_id'];
                 $constituency_id = $data['constituency_id'];
                 $lga = $data['lga_id'];
-                
-                // Create a new entry in the assessments index
-                DB::table("election_result_indices")->insert([
-                    "election_id" =>$election, 
-                    "election_code" => $ElectionCode
-                ]);
-                
+        
                 if($lga >= 1){
-                    //creating election polling units
-                    $C = \App\PollingStation::where('state_id','=',$state_id)
-                    ->where('constituency_id','=',$constituency_id)
-                    ->where('lga_id','=',$lga)->get();
+                    $polling_stations = PollingStation::where([
+                        'state_id'          => $state_id,
+                        'constituency_id'   => $constituency_id,
+                        'lga_id'            => $lga
+                    ])->get();
+
                 } else {
                     \DB::rollback();
-                    return redirect()->back()->with("error","Unable to get local government. Try again or contact system admin.");
+                    return $response = [
+                        'msg'   => "No Local Govt Found. Upload LGAs before continuing",
+                        'type'  => "false"
+                    ];
                 }
             }
 
-            //creating a new table for election results
-            \Schema::create("polling_".$ElectionCode."_results", function (Blueprint $table) use ($parties) {
-                $table->increments('id');
-                $table->integer('election_id')->unsigned()->index();
-                $table->integer('state_id')->unsigned()->index();
-                $table->integer('constituency_id')->unsigned()->index()->nullable();
-                $table->integer('lga_id')->unsigned()->index();
-                $table->integer('ward_id')->unsigned()->index();
-                $table->integer('polling_station_id')->unsigned()->index();
-                $table->integer('user_id')->unsigned()->index()->nullable();
-                $table->integer('accr_voters')->nullable();
-                $table->integer('void_voters')->nullable();
-                $table->integer('status');
-                $table->integer('step')->default(1);
-                $table->integer('confirmed_voters')->nullable();
-                
-                // create columns based on the number of parties
-                foreach($parties as $key=>$v){
-                    $party_code = \App\PoliticalParty::find($v);
-                    $p = strtolower($party_code['code']);
-                    $table->string($p);
-                }
-                $table->timestamps();
-            });
-
-            // Populate the table with the definition
-            $insertData = [];
-            foreach($C as $c){
-                // sleep(1); // Here call your time taking function like sending bulk sms etc.
-
-                $insertData = [
-                    "election_id"=>$election,
-                    "state_id"=> $c->state_id,
-                    "constituency_id"=> $c->constituency_id,
-                    "lga_id"=>$c->lga_id,
-                    "ward_id"=>$c->ward_id,
-                    "polling_station_id"=>$c->id,
-                    "accr_voters"=>0,
-                    "void_voters"=>0,
-                    "confirmed_voters"=>0,
-                    "status"=>1
+            if(count($polling_stations) < 1) {
+                return $response = [
+                    'msg'   => "There are no polling stations on the system. Polling station data are needed!",
+                    'type'  => "false"
                 ];
-
-                foreach($parties as $key=>$v){
-                    $party_code = \App\PoliticalParty::find($v);
-                    $p = strtolower($party_code['code']);
-                    $insertData[$p] = 0;
-                }
-
-                \DB::table("polling_".$ElectionCode."_results")->insert($insertData);
-
-                //creating api token access for each polling unit under this election
-                $token = new \App\ElectionOnetimePassword();
-                $token->election_id = $election;
-                $token->state_id = $c->state_id;
-                $token->constituency_id = $c->constituency_id;
-                $token->lga_id = $c->lga_id;
-                $token->ward_id = $c->ward_id;
-                $token->polling_unit_id = $c->id;
-                $token->otp = rand(111111,999999);
-                $token->api_token = str_random(60);
-                $token->save();
-
-                // ob_flush(); 
-                // flush(); 
             }
+            
+            foreach($parties as $key => $value){
+                $election_parties = DB::table("election_parties")->insert([
+                    'election_id'           => $election,
+                    'political_party_id'    => $value
+                ]);
+
+                foreach($polling_stations as $station) {
+                    $entries = DB::table("election_entries")->insert([
+                        "election_id"           => $election,
+                        "political_party_id"     => $value,
+                        "party_code"            => party_code($value),
+                        "state_id"              => $station->state_id,
+                        "constituency_id"       => $station->constituency_id,
+                        "lga_id"                => $station->lga_id,
+                        "ward_id"               => $station->ward_id,
+                        "polling_station_id"    => $station->id,
+                        "accr_voters"           => 0,
+                        "void_voters"           => 0,
+                        "confirmed_voters"      => 0,
+                        "votes"                 => 0
+                    ]);
+
+                    $passcode = DB::table('election_passcodes')->insert([
+                        "election_id"           => $election,
+                        "state_id"              => $station->state_id,
+                        "constituency_id"       => $station->constituency_id,
+                        "lga_id"                => $station->lga_id,
+                        "ward_id"               => $station->ward_id,
+                        "polling_station_id"    => $station->id,
+                        "otp"                   => rand(111111,999999),
+                        "api_token"             => str_random(60)
+                    ]);
+                }
+            }		
+
+            $user_election = DB::table("user_elections")->insert([
+                'election_id'   => $election,
+                'user_id'       => \Auth::user()->id,
+            ]);
 
             $time_end = microtime(true);
             $execution_time = ($time_end - $time_start)/60;
-
-            \DB::commit();
-            \Session::flash("success", "Completed successfully in $execution_time Min");
+            $time = round($execution_time);
+           
+            DB::commit();
             return $response = [
-                'msg' => "Completed successfully in $execution_time Min",
-                'type' => "true"
+                'msg'   => "Completed in $time Mins",
+                'type'  => "true"
             ];
 
         } catch(Exception $e) {
-            \DB::rollback();
+            DB::rollback();
             return $response = [
-                'msg' => "Failed! An error occured.",
-                'type' => "false"
+                'msg'   => "Internal Server Error",
+                'type'  => "false"
             ];
         }
     }
@@ -332,63 +266,14 @@ class ElectionController extends Controller
     }
 
 
-    public function showStats(Request $request) {
+    public function showStats(Request $request) 
+    {
         $param = $request->except('_token');
-
         $data['election'] = Election::find($param['slug'],'slug');
-        $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-        $data['resultSummary'] = $data['election']->get_all_total_result();
-        // $data['latestResult'] = $data['election']->get_result_summary('state',config('constants.ACTIVE_STATE_ID'))
-        //                     ->orderBy('id','ASC')->where('status','=',2)->get();
-
-        //passing charts to the view
-        if($data['election']['election_type_id'] == 1){
-
-            $data['pieChart'] = displayCharts('pie','general',$data['election']);
-            $data['barChart'] = displayCharts('bar','general',$data['election']);
-            $data['areaChart'] = displayCharts('area','general',$data['election']);
-            $data['donutChart'] = displayCharts('donut','general',$data['election']);
-            
-            //sending latest submittee result to the view
-            $data['latest'] = $data['election']->get_latest_submitted_result();
-            $data['parties'] = $data['election']->fnAssignParties()->get();
-
-        } elseif($data['election']['election_type_id'] == 2){
-            
-            $data['pieChart'] = displayCharts('pie','state',$data['election'],$data['pollingUnits']->state_id);
-            $data['barChart'] = displayCharts('bar','state',$data['election'],$data['pollingUnits']->state_id);
-            $data['areaChart'] = displayCharts('area','state',$data['election'],$data['pollingUnits']->state_id);
-            $data['donutChart'] = displayCharts('donut','state',$data['election'],$data['pollingUnits']->state_id);
-            
-            //sending latest submittee result to the view
-            $data['latest'] = $data['election']->get_latest_submitted_result();
-            $data['parties'] = $data['election']->fnAssignParties()->get();
-
-        } elseif($data['election']['election_type_id'] == 3) {
-
-            $data['pieChart'] = displayCharts('pie','constituency',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id);
-            $data['barChart'] = displayCharts('bar','constituency',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id);
-            $data['areaChart'] = displayCharts('area','constituency',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id);
-            $data['donutChart'] = displayCharts('donut','constituency',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id);
-
-            //sending latest submittee result to the view
-            $data['latest'] = $data['election']->get_latest_submitted_result();
-            $data['parties'] = $data['election']->fnAssignParties()->get();
-
-        } elseif($data['election']['election_type_id'] == 4){
-
-            $data['pieChart'] = displayCharts('pie','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id);
-            $data['barChart'] = displayCharts('bar','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id);
-            $data['areaChart'] = displayCharts('area','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id);
-            $data['donutChart'] = displayCharts('donut','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id);
-            $data['wards'] = Ward::where("state_id","=",$data['pollingUnits']->state_id)
-                    ->where("constituency_id","=",$data['pollingUnits']->constituency_id)
-                    ->where("lga_id","=",$data['pollingUnits']->lga_id)->get();
-
-            //sending latest submittee result to the view
-            $data['latest'] = $data['election']->get_latest_submitted_result();
-            $data['parties'] = $data['election']->fnAssignParties()->get();
-        }
+        $data['barchart'] = ChartDisplay($data['election'],'bar');
+        $data['linechart'] = ChartDisplay($data['election'],'line');
+        $data['piechart'] = ChartDisplay($data['election'],'pie');
+        $data['donutchart'] = ChartDisplay($data['election'],'donut');
 
         return view('admin.election.partials._show_current_stats')->with($data);
     }
@@ -398,10 +283,11 @@ class ElectionController extends Controller
     public function passcodeView($id) 
     {
         $data['election'] = Election::find($id,'slug');
-        $data['passcodes'] = ElectionOnetimePassword::where('election_id','=',$data['election']['id'])->get();
+        $data['passcodes'] = ElectionPasscode::where('election_id','=',$data['election']['id'])->get();
 
         return view('admin.election.passcode')->with($data);
     }
+
 
     public function InfographicView($id) 
     {
@@ -422,153 +308,112 @@ class ElectionController extends Controller
     }
 
 
-
     public function viewSubmittedResult($id)
     {
         $data['election'] = Election::find($id,'slug');
-        $ElectionCode = ElectionResultIndex::where('election_id','=',$data['election']->id)->first();
-        $code = $ElectionCode['election_code'];
-        $data['results'] = \DB::table("polling_".$code."_results")
-                ->where("election_id","=",$data['election']->id)
-                ->where('status','=',2)->get();
-        $data['parties'] = $data['election']->fnAssignParties()->get();
+        $data['polling_stations'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('polling_station_id')->get();
+        $data['wards'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('ward_id')->get();
+        $data['lgas'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('lga_id')->get();
+        $data['states'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('state_id')->get();
+        $data['votes'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->get();
 
+        $data['parties'] = $data['election']->parties()->get();
 
-        return view('admin.election.view-submitted-result')->with($data);
+        return view('admin.election.result.index')->with($data);
     }
 
 
-    public function queryResult(Request $request)
+    public function winMetricIndex($id)
     {
-        $param = $request->except('_token');
+        $data['election'] = Election::find($id,'slug');
+        $data['polling_stations'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('polling_station_id')->get();
+        $data['wards'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('ward_id')->get();
+        $data['lgas'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('lga_id')->get();
+        $data['states'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->groupBy('state_id')->get();
+        $data['votes'] = DB::table("election_entries")->where([
+            "election_id"         => $data['election']->id,
+            "is_submitted"        => true
+        ])->get();
 
-        if($param['req'] == 'ward-result'){
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','ward',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id,$param['ward_id']);
-            $data['barChart'] = displayCharts('bar','ward',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id,$param['ward_id']);
-            $data['areaChart'] = displayCharts('area','ward',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id,$param['ward_id']);
-            $data['donutChart'] = displayCharts('donut','ward',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$data['pollingUnits']->lga_id,$param['ward_id']);
+        $data['parties'] = $data['election']->parties()->get();
 
-            return view('admin.election.partials._show_current_stats')->with($data);
-        }
+        return view('admin.election.metrics.index')->with($data);
+    }
 
-        if($param['req'] == 'ward-result-governor'){
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','ward',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id']);
-            $data['barChart'] = displayCharts('bar','ward',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id']);
-            $data['areaChart'] = displayCharts('area','ward',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id']);
-            $data['donutChart'] = displayCharts('donut','ward',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id']);
 
-            return view('admin.election.partials._show_current_stats')->with($data);
-        }
+    public function markStar(Request $request)
+    {
+        $data = $request->except('_token');
+        if($data) {
+            DB::beginTransaction();
+            try {
+                $reset = ElectionParty::where('election_id',$data['election_id'])->update(['is_star_party' => false]);
+                $update = ElectionParty::where([
+                    'election_id'           => $data['election_id'],
+                    'political_party_id'    => $data['party_id']
+                ])->first();
+                $update->is_star_party = true;
+                $update->save();
 
-        if($param['req'] == 'constituency-result'){
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','constituency',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id']);
-            $data['barChart'] = displayCharts('bar','constituency',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id']);
-            $data['areaChart'] = displayCharts('area','constituency',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id']);
-            $data['donutChart'] = displayCharts('donut','constituency',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id']);
+                DB::commit();
+                return "Marked Successfully";
 
-            return view('admin.election.partials._show_current_stats')->with($data);
-        }
-
-        if($param['req'] == 'lga-result') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$param['lga_id']);
-            $data['barChart'] = displayCharts('bar','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$param['lga_id']);
-            $data['areaChart'] = displayCharts('area','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$param['lga_id']);
-            $data['donutChart'] = displayCharts('donut','local',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->constituency_id,$param['lga_id']);
-
-            return view('admin.election.partials._show_current_stats')->with($data);
-        }
-
-        if($param['req'] == 'lga-result-gov') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','local',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id']);
-            $data['barChart'] = displayCharts('bar','local',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id']);
-            $data['areaChart'] = displayCharts('area','local',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id']);
-            $data['donutChart'] = displayCharts('donut','local',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id']);
-
-            return view('admin.election.partials._show_current_stats')->with($data);
-        }
-
-        if($param['req'] == 'showLgas') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['lgas'] = Lga::where('state_id','=',$data['pollingUnits']->state_id)
-                            ->where('constituency_id','=',$param['constituency_id'])->get();
-
-            return view('admin.election.partials.data._show_lgas')->with($data);
-        }
-
-        if($param['req'] == 'showUnits') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['units'] = PollingStation::where('state_id','=',$data['pollingUnits']->state_id)
-                            ->where('lga_id','=',$data['pollingUnits']->lga_id)
-                            ->where('ward_id','=',$data['pollingUnits']->ward_id)->get();
-
-            return view('admin.election.partials.data._show_units')->with($data);
-        }
-
-        if($param['req'] == 'showWards') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['wards'] = Ward::where('state_id','=',$data['pollingUnits']->state_id)
-                            ->where('constituency_id','=',$data['pollingUnits']->constituency_id)
-                            ->where('lga_id','=',$param['lga_id'])->get();
-
-            return view('admin.election.partials.data._show_wards')->with($data);
-        }
-
-        if($param['req'] == 'unit-result') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','stations',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->lga_id,$param['ward_id'],$param['unit_id']);
-            $data['barChart'] = displayCharts('bar','stations',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->lga_id,$param['ward_id'],$param['unit_id']);
-            $data['areaChart'] = displayCharts('area','stations',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->lga_id,$param['ward_id'],$param['unit_id']);
-            $data['donutChart'] = displayCharts('donut','stations',$data['election'],$data['pollingUnits']->state_id,$data['pollingUnits']->lga_id,$param['ward_id'],$param['unit_id']);
-
-            return view('admin.election.partials._show_current_stats')->with($data);
-        }
-
-        if($param['req'] == 'unit-result-governor') {
-            $data['election'] = Election::find($param['slug'],'slug');
-            $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-            $data['pieChart'] = displayCharts('pie','stations',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id'],$param['unit_id']);
-            $data['barChart'] = displayCharts('bar','stations',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id'],$param['unit_id']);
-            $data['areaChart'] = displayCharts('area','stations',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id'],$param['unit_id']);
-            $data['donutChart'] = displayCharts('donut','stations',$data['election'],$data['pollingUnits']->state_id,$param['constituency_id'],$param['lga_id'],$param['ward_id'],$param['unit_id']);
-
-            return view('admin.election.partials._show_current_stats')->with($data);
+            } catch(Exception $e) {
+                DB::rollback();
+                return false;
+            }
         }
     }
 
 
-
-    //function for view a single election
     public function view($id)
     {   
-        // \Session::flush();
         $data['election'] = Election::find($id,'slug');
-        $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
-        $data['resultSummary'] = $data['election']->get_result_summary('state',$data['pollingUnits']->state_id);
-        $data['users'] = User::all();
-
-        $data['wards'] = Ward::where("state_id","=",$data['pollingUnits']->state_id)
-                    ->where("constituency_id","=",$data['pollingUnits']->constituency_id)
-                    ->where("lga_id","=",$data['pollingUnits']->lga_id)->get();
-        $data['lgas'] = Lga::where("state_id","=",$data['pollingUnits']->state_id)
-                    ->where("constituency_id","=",$data['pollingUnits']->constituency_id)->get();
-
-        $data['constituency'] = Constituency::where("state_id","=",$data['pollingUnits']->state_id)->get();
+        $data['politicalParties'] = $data['election']->parties()->get();
         
         return view('admin.election.view-one')->with($data);
+    }
+
+
+    public function broadsheetIndex($slug)
+    {
+        $data['election'] = Election::find($slug,'slug');
+        $data['politicalParties'] = $data['election']->parties()->get();
+        $result = $data['election']->get_all_total_result();
+        $data['barchart'] = ChartDisplay($data['election'],'bar');
+        $data['linechart'] = ChartDisplay($data['election'],'line');
+        $data['piechart'] = ChartDisplay($data['election'],'pie');
+        $data['donutchart'] = ChartDisplay($data['election'],'donut');
+        $data['setting'] = Preference::find(1);
+
+        return view('admin.election.broadsheet')->with($data);
     }
 
 
@@ -577,7 +422,7 @@ class ElectionController extends Controller
         $data['pollingUnits'] = $data['election']->fnPollingUnits()->first();
         $data['users'] = User::all();
 
-        $data['reports'] = PivotElectionReport::where('election_id','=',$data['election']->id)
+        $data['reports'] = ElectionReport::where('election_id','=',$data['election']->id)
                 ->where('status','=',2)->orderBy('id','ASC')->get();
         
         return view('admin.election.reports')->with($data);

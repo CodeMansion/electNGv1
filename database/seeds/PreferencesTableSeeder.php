@@ -15,11 +15,18 @@ class PreferencesTableSeeder extends Seeder
         \DB::table("preferences")->truncate();
         \App\Preference::insert([
             [
-                'id' => 1,
-                'page_refresh' => 1,
-                'page_refresh_interval' => 30000,
-                'sound_notification' => 1,
-                'party_counter' => 1
+                'id'                        => 1,
+                'host'                      => 'smtp.mailtrap.io',
+                'username'                  => 'adffdsfasdadgd2334',
+                'password'                  => 'adsfasdfadsf233',
+                'port'                      => 456,
+                'encryption'                => "tls",
+                'enable_page_refresh'       => true,
+                'enable_sound_notification' => true,
+                'enable_integrity_check'    => false,
+                'enable_report_image'       => false,
+                'enable_ward_result'        => false,
+                'enable_result_override'    => false
             ],
         ]);
     }

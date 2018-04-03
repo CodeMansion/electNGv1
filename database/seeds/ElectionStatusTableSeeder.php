@@ -15,13 +15,13 @@ class ElectionStatusTableSeeder extends Seeder
         DB::table('election_statuses')->truncate();
 
         DB::table('election_statuses')->insert([
-            'name' => 'Unprocessed',
+            'name' => 'Processing',
             'slug' => 'unprocessed',
-            'class' => 'secondary'
+            'class' => 'warning'
         ]);
 
         DB::table('election_statuses')->insert([
-            'name' => 'Active',
+            'name' => 'On-going',
             'slug' => 'active',
             'class' => 'success'
         ]);

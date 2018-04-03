@@ -14,9 +14,9 @@ use Illuminate\Http\Request;
 */
 Route::group(['prefix' => 'v1'], function() {
 	//api route for check/validating election token
-	Route::post('login', 'API\CheckElectionController@store');
-	Route::post('election-details', 'API\SubmitResultController@index');
-	Route::post('parties', 'API\CheckElectionController@getParties');
+	Route::post('/login', 'API\CheckElectionController@store');
+	Route::post('/election-details', 'API\SubmitResultController@index');
+	Route::post('/parties', 'API\CheckElectionController@getParties');
 
 	//api route for submit election result
 	Route::get('election-types', 'API\SubmitResultController@index');

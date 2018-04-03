@@ -4,6 +4,12 @@
     <link href="{{ asset('assets/global/plugins/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/global/css/components.min.css') }}" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/select2/css/select2-bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
     <div class="breadcrumbs">
@@ -55,9 +61,9 @@
                                 </div>
                             </div>
                             <div class="portlet-body">
-                                @if(count($elections) < 1)
-                                    <div class="danger-well">
-                                        <em>No Election has been added on this system Use the button above to create a new election.</em>
+                                @if(count($userElections) < 1)
+                                    <div class="alert alert-danger">
+                                        <em>No Election Found.</em>
                                     </div>
                                 @else
                                     <div class="row">
@@ -76,27 +82,29 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    @php($index=0)
                                                     @php($count=1)
-                                                    @foreach($elections as $election)
+                                                    @foreach($userElections as $election)
                                                         <tr>
                                                             <td>{{ $count }}</td>
                                                             <td>{{$election['name']}}</td>
                                                             <td>{{$election['description']}}</td>
                                                             <td><span class="badge badge-{{$election->status->class}}"> {{$election->status->name}}</span></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td></td>
+                                                            <td>{{ $election['start_date'] }}</td>
+                                                            <td>{{ $election['end_date'] }}</td>
+                                                            <td>{{ $election->types->name }}</td>
                                                             <td>
                                                                 <div class="btn-group">
                                                                     <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="button" data-toggle="dropdown" aria-expanded="false"> Actions<i class="fa fa-angle-down"></i></button>
                                                                     <ul class="dropdown-menu pull-left" role="menu">
-                                                                        <li><a href="{{URL::route('Election.ViewOne',$election['slug'])}}"><i class="icon-note"></i> View Election </a></li>
-                                                                        <!--  -->
+                                                                        <li><a href="{{ URL::route('Election.ViewOne',$election['slug']) }}"><i class="icon-note"></i> Manage Election </a></li>
+                                                                        <li><a href="#"><i class="icon-trash"></i> Delete </a></li>
                                                                     </ul>
                                                                 </div>
                                                             </td>
                                                         </tr>
                                                     @php($count++)
+                                                    @php($index++)
                                                     @endforeach
                                                 </tbody>
                                             </table>
@@ -115,15 +123,24 @@
     <script src="{{ asset('assets/global/scripts/datatable.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/jquery.validate.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/jquery-validation/js/additional-methods.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/select2/js/select2.full.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js') }}" type="text/javascript"></script>
     <script>
-        var URL = "{{URL::route('Election.New')}}";
-        var URL_CHECK = "{{URL::route('ElectionAjax')}}";
+        var INSERT = "{{ URL::route('Election.New') }}";
+        var URL_CHECK = "{{ URL::route('ElectionAjax') }}";
         var TOKEN = "{{csrf_token()}}";
     </script>
     <script src="{{ asset('js/pages/election.js') }}"></script>
 @endsection
 @section('after_script')
     <script src="{{ asset('assets/pages/scripts/table-datatables-managed.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/pages/scripts/components-date-time-pickers.min.js') }}" type="text/javascript"></script>
 @endsection
 @section('modals')
     @include('admin.election.modals._new_election')

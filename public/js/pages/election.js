@@ -127,10 +127,10 @@ $(document).ready(function() {
             if(type == '1') {
                 $("#ErrorMsg").html("");
                 $(this).attr('disabled',true);
-                $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a little time");
+                $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a minute");
 
                 $.ajax({
-                    url: URL,
+                    url: INSERT,
                     method: "POST",
                     data:{
                         '_token': TOKEN,
@@ -168,10 +168,10 @@ $(document).ready(function() {
                 } else {
                     $("#ErrorMsg").html("");
                     $(this).attr('disabled',true);
-                    $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a little time");
+                    $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a minute");
 
                     $.ajax({
-                        url: URL,
+                        url: INSERT,
                         method: "POST",
                         data:{
                             '_token': TOKEN,
@@ -213,10 +213,10 @@ $(document).ready(function() {
                 } else {
                     $("#ErrorMsg").html("");
                     $(this).attr('disabled',true);
-                    $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a little time");
+                    $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a minute");
 
                     $.ajax({
-                        url: URL,
+                        url: INSERT,
                         method: "POST",
                         data:{
                             '_token': TOKEN,
@@ -261,10 +261,10 @@ $(document).ready(function() {
                 } else {
                     $("#ErrorMsg").html("");
                     $(this).attr('disabled',true);
-                    $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a little time");
+                    $(this).html("<i class='fa fa-spinner fa-spin'></i> Processing... this may take a minute");
 
                     $.ajax({
-                        url: URL,
+                        url: INSERT,
                         method: "POST",
                         data:{
                             '_token': TOKEN,
@@ -305,5 +305,4 @@ $(document).ready(function() {
     $("select[name=lga_id]").on("change", function() {
         $("#view-parties").show();
     });
-        
 }); 

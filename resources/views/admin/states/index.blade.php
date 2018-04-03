@@ -19,19 +19,39 @@
             <!-- BEGIN PAGE SIDEBAR -->
             <div class="page-sidebar">
                 <nav class="navbar" role="navigation">
-                    <!-- Brand and toggle get grouped for better mobile display -->
-                    <!-- Collect the nav links, forms, and other content for toggling -->
                     <ul class="nav navbar-nav margin-bottom-35">
-                        <li><a href="index.html"><i class="icon-home"></i> Home </a></li>
-                        <li><a href="#"><i class="icon-note "></i> Reports </a></li>
-                        <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> User </a></li>
-                        <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
-                        <li><a href="#"><i class="icon-bell"></i> Activity Logs </a></li>
-                        <li><a href="{{URL::route('State.View')}}"><i class="icon-flag"></i> States & LGAs</a></li>
-                        <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Units</a></li>
-                        <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
-                        <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
-                        <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> Settings </a></li>
+                        @if(\Auth::user()->isAn('admin'))
+                            <li><a href="{{ URL::route('Dashboard') }}"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                            <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> Manage Users </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Stations</a></li>
+                            <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                            <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                            <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> System Settings </a></li>
+                        @endif
+                        @if(\Auth::user()->isAn('moderator'))
+                            <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                            <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> Manage Users </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Stations</a></li>
+                            <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                            <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                        @endif
+                        @if(\Auth::user()->isAn('agent'))
+                            <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="#"><i class="icon-directions"></i> My Profile</a></li>
+                            <li><a href="#"><i class="icon-directions"></i> Change Password</a></li>
+                        @endif
+                        @if(\Auth::user()->isAn('contestant'))
+                        <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Stations</a></li>
+                            <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                        @endif
                     </ul>
                 </nav>
             </div>

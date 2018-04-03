@@ -15,14 +15,14 @@ class PreferencesController extends Controller
      */
     public function index()
     {
-        $data['settings'] = Preference::find(1);
+        $data['setting'] = Preference::find(1);
 
-        return view('admin.preferences..index')->with($data);
+        return view('admin.preferences.index')->with($data);
     }
 
     public function bulkUploadIndex()
     {
-        return view('admin.bulk-upload.bulk-upload-index');
+        return view('admin.bulk-upload.index');
     }
 
     public function storeBulkUpload(Request $request)
@@ -30,7 +30,6 @@ class PreferencesController extends Controller
         $data = $request->except('_token');
 
         if($request->hasFile('file')){
-            // \DB::beginTransaction();
             try {
                 ini_set('max_execution_time',0);
                 $time_start = microtime(true);
@@ -39,18 +38,17 @@ class PreferencesController extends Controller
                 
                 $time_end = microtime(true);
                 $execution_time = ($time_end - $time_start)/60;
+                $time = round($execution_time);
 
-                // \DB::commit();
                 return $response = [
-                    'msg' => "Upload Completed successfully in $execution_time Mins",
-                    'type' => "true"
+                    'msg'   => "Upload Completed successfully in $time Mins",
+                    'type'  => "true"
                 ];
 
             } catch(Exception $e) {
-                // \DB::rollback();
                 return $response = [
-                    'msg' => "File could not upload",
-                    'type' => "false"
+                    'msg'   => "File could not upload",
+                    'type'  => "false"
                 ];
             }
  
@@ -80,22 +78,35 @@ class PreferencesController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
+        $data = $request->except('_token');
         \DB::beginTransaction();
         try {
-            $update = \DB::table("preferences")->where("id","=",1)->update([
-                'page_refresh' => (int)$data['page_refresh'],
-                'sound_notification' => (int)$data['sound'],
-                'party_counter' => (int)$data['party_counter'],
-                'page_refresh_interval' => (int)$data['interval']
+            $update = Preference::where("id","=",1)->update([
+                'enable_page_refresh'              => $data['page_refresh'],
+                'enable_sound_notification'        => $data['sound_notification'],
+                'enable_integrity_check'           => $data['integrity_check'],
+                'enable_report_image'              => $data['report_upload'],
+                'enable_ward_result'               => $data['ward_result'],
+                'enable_result_override'           => $data['result_override'],
+                'host'                             => $data['host'],
+                'port'                             => $data['port'],
+                'username'                         => $data['username'],
+                'password'                         => $data['password'],
+                'encryption'                       => $data['encryption']
             ]);
 
             \DB::commit();
-            return redirect()->back()->with("success","Settings updated successfully.");
+            return $response = [
+                'msg'   => "Updated Successfully",
+                'type'  => "true"
+            ];
 
         } catch(Exception $e) {
             \DB::rollback();
-            return redirect()->back()->with("error",$e->getMessage());
+            return $response = [
+                'msg' => "Internal Server Error",
+                'type' => "false"
+            ]; 
         }
     }
 

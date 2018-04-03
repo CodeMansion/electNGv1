@@ -239,7 +239,7 @@ var TableDatatablesManaged = function () {
                 [5, 15, 20, "All"] // change per page values here
             ],
             // set the initial value
-            "pageLength": 5,
+            "pageLength": 50,
             "columnDefs": [{  // set default column settings
                 'orderable': false,
                 'targets': [0]
