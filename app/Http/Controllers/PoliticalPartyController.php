@@ -53,8 +53,15 @@ class PoliticalPartyController extends Controller
                 $pp->slug = bin2hex(random_bytes(64));
                 $pp->code = $data['code'];
                 $pp->description = $data['description'];
-                $pp->save();
 
+                if($request->file('logo')) {
+                    $file = $request->file('logo');
+                    $path = UploadPartyLogo($file,$data['code']);
+                    $pp->image = convertImgToBase64($path);
+                }
+
+                $pp->save();
+                
                 \DB::commit();
                 return "Political Party created successfully.";
 

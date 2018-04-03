@@ -11,19 +11,23 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
-        //Category default data
         DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         DB::table('roles')->truncate();
-        
         \App\Role::insert([
-            [
-		        'name' => 'Administrator',
-		        'label' => 'Administrator Access',
-            ],
-            [
-		        'name' => 'Candidate',
-		        'label' => 'Candidate Access',
-            ]
+            'name'  => 'admin',
+            'label' => 'Administrator Access',
+        ]);
+        \App\Role::insert([
+            'name'  => 'moderator',
+            'label' => 'Modrator Access',
+        ]);
+        \App\Role::insert([
+            'name'  => 'agent',
+            'label' => 'Party Agent Access',
+        ]);
+        \App\Role::insert([
+            'name'  => 'contestant',
+            'label' => 'Eleaction Candidate Access',
         ]);
     }
 }

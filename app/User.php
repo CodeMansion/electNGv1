@@ -29,27 +29,16 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-
     public function profile(){
         return $this->hasOne(UserProfile::class);
-    }
-
-    public function scopeAdmin($query){
-        return $query->where('user_type_id', 1);
-    }
-
-    public function scopeUsers($query){
-        return $query->whereIn('user_type_id', [
-            2, 3, 4
-        ]);
     }
 
     public function setPasswordAttribute($value){
         return $this->attributes['password'] = bcrypt($value);
     }
 
-    public function userType(){
-        return $this->belongsTo('App\UserType');
+    public function category(){
+        return $this->belongsTo('App\UserCategory', 'user_category_id');
     }
 
     public function isActivated(){
@@ -59,36 +48,30 @@ class User extends Authenticatable
         return true;
     }
 
-    public function isAdmin(){
-        if(!in_array($this->user_type_id, [1, 4, 3])){
-            return false;
-        }
-        return true;
-    }
-
     public static function find($id, $field = null){
         if($field){
-            return self::where($field, '=', $id)->firstOrFail();
+            return self::where($field,$id)->firstOrFail();
         }
-        return self::where('id', '=', $id)->firstOrFail();
+        return self::where('id',$id)->firstOrFail();
     }
 
     public static function hasEmail($field){
-        $data = self::where('email','=',$field)->first();
-        if($data){
-            return true;
-        }
-        return false;
+        $check = self::where('email',$field)->first();
+        return ($check);
+    }
+
+    public function elections() {
+        return $this->belongsToMany('App\Election', 'user_elections');
     }
 
 
     public function roles(){
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany('App\Role');
     }
 
     public function hasRole($role){
         if(is_string($role)){
-            return $this->roles->contains('name',$role);
+            return $this->roles->contains('name', $role);
         }
 
         foreach($role as $r){
@@ -104,5 +87,20 @@ class User extends Authenticatable
         return $this->roles()->save(
             Role::whereId($role)->firstOrFail()
         );
+    }
+
+    public function isAn($field) {
+        $roles = \DB::table('role_user')->where([
+            'user_id'   => $this->id,
+        ])->get();
+
+        foreach($roles as $role) {
+            $check = Role::find($role->role_id);
+            if(isset($check) && $check->name == $field){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

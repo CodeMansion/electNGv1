@@ -14,11 +14,15 @@ class CreateLgasTable extends Migration
     public function up()
     {
         Schema::create('lgas', function (Blueprint $table) {
+            $table->engine = "InnoDB";
             $table->increments('id');
             $table->string('name');
             $table->integer('state_id')->unsigned();
             $table->integer('constituency_id')->unsigned()->nullable();
             $table->timestamps();
+
+            $table->foreign('state_id')->references('id')->on('states');
+            $table->foreign('constituency_id')->references('id')->on('constituencies');
         });
     }
 

@@ -13,19 +13,26 @@ class CreatePivotElectionReportsTable extends Migration
      */
     public function up()
     {
-        Schema::create('pivot_election_reports', function (Blueprint $table) {
+        Schema::create('election_reports', function (Blueprint $table) {
+            $table->engine = "InnoDB";
             $table->increments('id');
             $table->integer('election_id')->unsigned()->index();
             $table->integer('state_id')->unsigned()->index();
             $table->integer('constituency_id')->unsigned()->index()->nullable();
             $table->integer('ward_id')->unsigned()->index();
             $table->integer('lga_id')->unsigned()->index();
-            $table->integer('polling_unit_id')->unsigned()->index();
-            $table->integer('user_id')->unsigned()->index()->nullable();
+            $table->integer('polling_station_id')->unsigned()->index();
             $table->integer('status')->default(1);
-            $table->string('comment')->nullable();
-            $table->string('title')->nullable();
+            $table->string('comment');
+            $table->string('title');
             $table->timestamps();
+
+            $table->foreign('election_id')->references('id')->on('elections');
+            $table->foreign('state_id')->references('id')->on('states');
+            $table->foreign('constituency_id')->references('id')->on('constituencies');
+            $table->foreign('lga_id')->references('id')->on('lgas');
+            $table->foreign('ward_id')->references('id')->on('wards');
+            $table->foreign('polling_station_id')->references('id')->on('polling_stations');
         });
     }
 

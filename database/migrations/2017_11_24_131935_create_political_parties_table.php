@@ -14,12 +14,14 @@ class CreatePoliticalPartiesTable extends Migration
     public function up()
     {
         Schema::create('political_parties', function (Blueprint $table) {
+            $table->engine = "InnoDB";
             $table->increments('id');
             $table->text('slug', 191);
             $table->string('name');
             $table->string('code');
             $table->string('description')->default();
             $table->integer('status')->default(1);
+            $table->LongText('image')->nullable();
             $table->timestamps();
         });
     }

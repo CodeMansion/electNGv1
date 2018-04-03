@@ -11,7 +11,7 @@ class Election extends Model
     ];
 
     public static function isElectionExists($field){
-        $data = self::where('name','=',$field)->first();
+        $data = self::where('name',$field)->first();
         if($data){
             return true;
         }
@@ -22,182 +22,129 @@ class Election extends Model
         return $this->belongsTo('App\ElectionStatus','election_status_id');
     }
 
-    public function Types(){
-        return $this->belongsTo(ElectionType::class);
+    public function types(){
+        return $this->belongsTo('App\ElectionType', 'election_type_id');
     }
 
-    public function setNameAttribute($value){
+    public function setNameAttribute($value) {
         return $this->attributes['name'] = ucfirst($value);
     }
 
     public static function find($id,$field=null){
         if($field){
-            return self::where($field, '=', $id)->firstOrFail();
+            return self::where($field,$id)->firstOrFail();
         }
-        return self::where('id', '=', $id)->firstOrFail();
+        return self::where('id',$id)->firstOrFail();
     }
 
-    public function fnAssignParties(){
-        return $this->belongsToMany('App\PoliticalParty', 'pivot_election_parties')
-                ->orderBy("code")
-                ->select(["political_parties.*"]);
+    public function entries() {
+        return $this->hasMany('App\ElectionEntry', 'election_id');
+    }
+
+    public function passcodes() {
+        return $this->hasMany('App\ElectionPasscode', 'election_id');
+    }
+
+    public function parties(){
+        return $this->belongsToMany('App\PoliticalParty', 'election_parties')
+            ->orderBy("code")
+            ->select(["political_parties.*"]);
     }
 
     public function fnPollingUnits(){
-        $polling_list = \DB::table("pivot_election_polling_units")
-                ->where("pivot_election_polling_units.election_id", "=", $this->id);
-
+        $polling_list = \App\ElectionPasscode::where("election_id", "=", $this->id);
         return $polling_list;
     }
 
 
-    public function get_polling_result($type,$state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$unit_id=null){
+    public function getResult($type,$state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$station_id=null){
+        if($type == 'general'){
+            $result = ElectionEntry::where("election_id","=",$this->id)->get();
+
+            return $result;
+        }
+
         if($type == 'state'){
-            $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
-            $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_".$code."_results")
-                            ->where("state_id","=",$state_id)
-                            ->where("election_id","=",$this->id);
-            
+            $result = ElectionEntry::where([
+                "election_id"   => $this->id,
+                "state_id"      => $state_id
+            ])->get();    
+
             return $result;
         }
 
         if($type == 'local'){
-            $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
-            $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_".$code."_results")
-                            ->where("election_id","=",$this->id)
-                            ->where("state_id","=",$state_id)
-                            ->where("constituency_id","=",$const_id)
-                            ->where("lga_id","=",$lga_id);  
-            
+            $result = ElectionEntry::where([
+                "election_id"       => $this->id,
+                "state_id"          => $state_id,
+                "constituency_id"   => $const_id,
+                "lga_id"            => $lga_id
+            ])->get(); 
+
             return $result;
         }
 
         if($type == 'constituency') {
-            $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
-            $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_".$code."_results")
-                            ->where("state_id","=",$state_id)
-                            ->where("constituency_id","=",$const_id)
-                            ->where("election_id","=",$this->id);
+            $result = ElectionEntry::where([
+                "election_id"       => $this->id,
+                "state_id"          => $state_id,
+                "constituency_id"   => $const_id
+            ])->get();
             
             return $result;
         }
 
         if($type == 'ward') {
-            $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
-            $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_".$code."_results")
-                            ->where("state_id","=",$state_id)
-                            ->where("constituency_id","=",$const_id)
-                            ->where("lga_id","=",$lga_id)
-                            ->where("ward_id","=",$ward_id)
-                            ->where("election_id","=",$this->id);
+            $result = ElectionEntry::where([
+                "election_id"       => $this->id,
+                "state_id"          => $state_id,
+                "constituency_id"   => $const_id,
+                "lga_id"            => $lga_id,
+                "ward_id"           => $ward_id
+            ])->get();
             
             return $result;
         }
 
         if($type == 'polling-station') {
-            $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
-            $code = $ElectionCode['election_code'];
-            $result = \DB::table("polling_".$code."_results")
-                            ->where("state_id","=",$state_id)
-                            ->where("lga_id","=",$lga_id)
-                            ->where("ward_id","=",$ward_id)
-                            ->where("polling_station_id","=",$unit_id)
-                            ->where("election_id","=",$this->id);
+            $result = ElectionEntry::where([
+                "election_id"           => $this->id,
+                "state_id"              => $state_id,
+                "constituency_id"       => $const_id,
+                "lga_id"                => $lga_id,
+                "ward_id"               => $ward_id,
+                "polling_station_id"    => $station_id
+            ])->get();
             
             return $result;
         }
     }
 
-    public function get_result_summary($type,$state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$unit_id=null)
+    public function getResultEntry($type,$state_id=null,$const_id=null,$lga_id=null,$ward_id=null,$unit_id=null)
     {
         $Ret = [];
-
-        //getting the parties involved in the election
-        $parties = $this->fnAssignParties()->get();
+        $party_accumulator = [];
+        $parties = $this->parties()->get();
 
         //looping through the parties to get individual party first
-        foreach($parties as $i => $party) {
-            $code = strtolower($party['code']);
+        foreach($parties as $party) {
+            $code = $party['code'];
             $Ret[$code] = 0;
         }
 
-        //querying result based on state level
-        if($type == 'state'){
-            $result = $this->get_polling_result('state',$state_id)->get();
-
-            //looping through the result to able to calculate total for each parties 
-            //under this election
+        //querying result based on presidency level
+        if($type == 'general'){
+            $result = $this->getResult('general');
+            
             foreach($result as $k => $val){
-                foreach($parties as $i => $party) {
-                    $code = strtolower($party['code']);
-                    $Ret[$code] += (int)$val->$code;
+                foreach($parties as $party) {
+                    if($val['political_party_id'] == $party['id']) {
+                        $party_accumulator[$k] = $party['votes'];
+                        $Ret[$code] = array_sum($party_accumulator);
+                    }
                 }
             }
 
-            return $Ret;  
-        }
-        
-        //querying result based on constituency level
-        if($type == 'constituency'){
-            $result = $this->get_polling_result('constituency',$state_id,$const_id)->get();
-
-            //looping through the result to able to calculate total for each parties 
-            //under this election
-            foreach($result as $k => $val){
-                foreach($parties as $i => $party) {
-                    $code = strtolower($party['code']);
-                    $Ret[$code] += (int)$val->$code;
-                }
-            }
-            return $Ret;  
-        }
-        
-        //querying result based on local govt level
-        if($type == 'local'){
-            $result = $this->get_polling_result('local',$state_id,$const_id,$lga_id)->get();
-
-            //looping through the result to able to calculate total for each parties 
-            //under this election
-            foreach($result as $k => $val){
-                foreach($parties as $i => $party) {
-                    $code = strtolower($party['code']);
-                    $Ret[$code] += (int)$val->$code;
-                }
-            }
-            return $Ret;  
-        }
-
-        //querying result based on ward level
-        if($type == 'ward'){
-            $result = $this->get_polling_result('ward',$state_id,$const_id,$lga_id,$ward_id)->get();
-
-            //looping through the result to able to calculate total for each parties 
-            //under this election
-            foreach($result as $k => $val){
-                foreach($parties as $i => $party) {
-                    $code = strtolower($party['code']);
-                    $Ret[$code] += (int)$val->$code;
-                }
-            }
-            return $Ret;  
-        }
-
-         //querying result based on polling units level
-        if($type == 'polling-station'){
-            $result = $this->get_polling_result('polling-station',$state_id,$lga_id,$ward_id,$unit_id)->get();
-
-            //looping through the result to able to calculate total for each parties 
-            //under this election
-            foreach($result as $k => $val){
-                foreach($parties as $i => $party) {
-                    $code = strtolower($party['code']);
-                    $Ret[$code] += (int)$val->$code;
-                }
-            }
             return $Ret;  
         }
     }
@@ -209,25 +156,25 @@ class Election extends Model
         
         return $result;
     }
+    
 
     public function get_all_total_result(){
         $Ret = [];
-        $ElectionCode = ElectionResultIndex::where('election_id','=',$this->id)->first();
-        $code = $ElectionCode['election_code'];
-        $result = \DB::table("polling_".$code."_results")->where("election_id","=",$this->id)->get();
-        
-        $parties = $this->fnAssignParties()->get();
-        foreach($parties as $i => $party) {
-            $code = strtolower($party['code']);
+        $result = $this->getResult('general');
+        $parties = $this->parties()->get();
+        foreach($parties as $party) {
+            $code = $party['code'];
             $Ret[$code] = 0;
         }
 
-        foreach($result as $k => $val){
-            foreach($parties as $i => $party) {
-                $code = strtolower($party['code']);
-                $Ret[$code] += (int)$val->$code;
+        foreach($parties as $i => $party) {
+            foreach($result as $k => $val){
+                if($val['party_code'] == $party['code']) {
+                    $Ret[$party['code']] += (int)$val['votes'];
+                }
             }
         }
+
         return $Ret;
     }
 }

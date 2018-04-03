@@ -10,18 +10,18 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', 'HomeController@index')->name('home');
 
 Route::group(['middleware'=>['auth']], function(){
-    Route::get('/dashboard', array('as'=>'Dashboard','uses'=>'HomeController@index'));
-    Route::get('/', 'HomeController@index')->name('home');
+    Route::get('/dashboard', array('as'=>'Dashboard','uses'=>'DashboardController@index'));
     
     //-- ELECTION ROUTES --//
     Route::group(['prefix' => 'election'], function () {
         Route::get('/overview', array('as'=>'Election.View','uses'=>'ElectionController@index'));
-        // Route::get('/add-election', array('as'=>'ElectionNew','uses'=>'ElectionController@indexNew'));
         Route::post('/create-election', array('as'=>'Election.New','uses'=>'ElectionController@store'));
         Route::get('/election-view/{id?}', array('as'=>'Election.ViewOne','uses'=>'ElectionController@view'));
         Route::get('/submitted-result/{id?}', array('as'=>'SubmittedResult','uses'=>'ElectionController@viewSubmittedResult'));
+        Route::get('/win-metrics/{id?}', array('as'=>'winMetric','uses'=>'ElectionController@winMetricIndex'));
         Route::get('/passcode-view/{id?}', array('as'=>'PasscodeView','uses'=>'ElectionController@passcodeView'));
         Route::get('/infographics-view/{id?}', array('as'=>'InfographicView','uses'=>'ElectionController@InfographicView'));
         Route::post('/ajax-calls', array('as'=>'ElectionAjax','uses'=>'ElectionController@AjaxProcess'));
@@ -31,6 +31,10 @@ Route::group(['middleware'=>['auth']], function(){
         Route::post('dashboard-stats', array('as'=>'Election.Stats','uses'=>'ElectionController@showStats'));
         Route::post('query-api', array('as'=>'QueryApi','uses'=>'ElectionController@queryResult'));
         Route::get('/reports/{id?}', array('as'=>'view.reports','uses'=>'ElectionController@reportsIndex'));
+        Route::get('/activity-logs/{id?}', array('as'=>'view.activity','uses'=>'ElectionController@activityLogIndex'));
+        Route::get('/broadsheet/{id?}', array('as'=>'Election.broadsheet','uses'=>'ElectionController@broadsheetIndex'));
+        Route::post('/mark-as-star-party', array('as'=>'MarkStar','uses'=>'ElectionController@markStar'));
+
     });
 
     //-- STATES ROUTES --//
@@ -45,7 +49,6 @@ Route::group(['middleware'=>['auth']], function(){
     });
 
     //-- USERS ROUTES --//
-    /** worked on this (Austin) **/
     Route::group(['prefix' => 'users'], function () {
         Route::get('/view-users', array('as'=>'Users.View','uses'=>'UsersController@index'));
         Route::post('/create-user', array('as'=>'Users.New','uses'=>'UsersController@store'));
@@ -53,19 +56,15 @@ Route::group(['middleware'=>['auth']], function(){
         Route::delete('/delete-user', array('as'=>'Delete.User','uses'=>'UsersController@destroy'));
     });
 
-    Route::group(['prefix' => 'ward'], function () {
-        Route::get('/', array('as'=>'ward.index','uses'=>'WardController@index'));
-        Route::get('/ajax-state',array('as' => 'ward.lga' ,'uses' => 'WardController@state_lga'));
-        Route::post('/store', array('as'=>'ward.store','uses'=>'WardController@store'));
-        Route::post('/update', array('as'=>'ward.update','uses'=>'WardController@update'));
-        Route::delete('/delete', array('as'=>'Delete.ward','uses'=>'WardController@destroy'));
-    });
-    Route::group(['prefix' => 'polling'], function () {
-        Route::get('/', array('as'=>'polling.index','uses'=>'PollingController@index'));
+    Route::group(['prefix' => 'polling-stations'], function () {
+        Route::get('/', array('as'=>'polling.index','uses'=>'PollingCentreController@index'));
         Route::get('/ajax-state',array('as' => 'polling.ward' ,'uses' => 'PollingController@ward'));
         Route::post('/store', array('as'=>'polling.store','uses'=>'PollingController@store'));
         Route::post('/update', array('as'=>'polling.update','uses'=>'PollingController@update'));
         Route::delete('/delete', array('as'=>'Delete.polling','uses'=>'PollingController@destroy'));
+        Route::post('/get-lgas', array('as'=>'getLga','uses'=>'PollingCentreController@getLga'));
+        Route::post('/get-wards', array('as'=>'getWard','uses'=>'PollingCentreController@getWard'));
+        Route::post('/get-polling-stations', array('as'=>'getPollingStation','uses'=>'PollingCentreController@getPollingStations'));
     });
 
     Route::group(['prefix' => 'roles'], function () {
@@ -75,7 +74,7 @@ Route::group(['middleware'=>['auth']], function(){
         Route::post('/assign_permission', array('as'=>'roles.assign_permission','uses'=>'RoleController@assign_permission'));
         Route::delete('/delete', array('as'=>'Delete.assign_roles','uses'=>'RoleController@destroy'));
     });
-    /** Stop here for now **/ 
+
     //-- POLITICAL PARTIES ROUTES --//
     Route::group(['prefix' => 'political-parties'], function () {
         Route::get('/', array('as'=>'PP.View','uses'=>'PoliticalPartyController@index'));
@@ -88,7 +87,7 @@ Route::group(['middleware'=>['auth']], function(){
         Route::get('/', array('as'=>'preference.uploadView','uses'=>'PreferencesController@bulkUploadindex'));
         Route::get('/preferences', array('as'=>'preference.index','uses'=>'PreferencesController@index'));
         Route::post('/bulk-upload', array('as'=>'preference.uploadStore','uses'=>'PreferencesController@storeBulkUpload'));
-        Route::post('/preferences', array('as'=>'preference.Store','uses'=>'PreferencesController@store'));
+        Route::post('/preferences', array('as'=>'preferenceUpdate','uses'=>'PreferencesController@store'));
     });
 });
 

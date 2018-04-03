@@ -1,90 +1,101 @@
-<!-- Header -->
-<header id="page-header">
-    <div class="content-header">
-        <div class="content-header-section">
-            <button type="button" class="btn btn-circle btn-dual-secondary" data-toggle="layout" data-action="sidebar_toggle">
-                <i class="fa fa-navicon"></i>
-            </button>
-            <button type="button" class="btn btn-circle btn-dual-secondary" data-toggle="layout" data-action="header_search_on">
-                <i class="fa fa-search"></i>
-            </button>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-rounded btn-dual-secondary create-hover" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @can('super_admin')
-                <i class="fa fa-refresh fa-spin ml-5"></i> Quick Links <i class="fa fa-angle-down ml-5"></i>
+<header class="page-header">
+    <nav class="navbar mega-menu" role="navigation">
+        <div class="container-fluid">
+            <div class="clearfix navbar-fixed-top">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="toggle-icon">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </span>
                 </button>
-                <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
-                    <a class="dropdown-item" href="{{URL::route('Election.View')}}"><i class="si si-note mr-5"></i> View Elections</a>
-                    <a class="dropdown-item" href="{{URL::route('Users.View')}}"><span><i class="si si-user"></i> User</span></a>
-                    <a class="dropdown-item" href="{{URL::route('PP.View')}}"><span><i class="si si-book-open mr-5"></i> Political Parties</span></a>
-                    <a class="dropdown-item" href="{{URL::route('State.View')}}"><span><i class="si si-note mr-5"></i> States & Local Govt</span></a>
-                    <a class="dropdown-item" href="{{URL::route('ward.index')}}"><i class="si si-users mr-5"></i> Wards & Polling Units</a>
-                    <a class="dropdown-item" href="{{URL::route('roles.index')}}"><i class="si si-lock mr-5"></i> Roles & Permissions</a>
-                    <a class="dropdown-item" href="{{URL::route('preference.uploadView')}}"><i class="si si-cloud-upload mr-5"></i> Bulk Upload</a>
-                    <a class="dropdown-item" href="{{URL::route('preference.index')}}"><i class="si si-settings mr-5"></i> Preferences</a>
-                </div>
-                @endcan
-            </div>
-        </div>
-
-        <!-- Right Section -->
-        <div class="content-header-section">
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-rounded btn-dual-secondary create-hover" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="si si-user"></i> {{\Auth::user()->username}} <i class="fa fa-angle-down ml-5"></i>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right min-width-150" aria-labelledby="page-header-user-dropdown">
-                    <a class="dropdown-item" href="#"><i class="si si-user mr-5"></i> My Profile</a>
-                    @can('super_admin')
-                        <a class="dropdown-item" href="#"><span><i class="si si-envelope-open mr-5"></i> Elections</span></a>
-                        <a class="dropdown-item" href="#"><i class="si si-note mr-5"></i> Reports</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{URL::route('preference.index')}}" data-toggle="layout" data-action="side_overlay_toggle">
-                            <i class="si si-wrench mr-5"></i> Settings
-                        </a>
-                    @endcan
-                    <a class="dropdown-item" href="javascript:void(0)" data-toggle="layout" data-action="side_overlay_toggle">
-                        <i class="si si-question mr-5"></i> Help
+                <!-- End Toggle Button -->
+                <!-- BEGIN LOGO -->
+                <a id="index" class="page-logo" href="#"><img class="img-avatar" src="{{ asset('images/logo.png') }}" alt=""> </a>
+                <!-- END LOGO -->
+                <!-- BEGIN SEARCH -->
+                <form class="search" action="extra_search.html" method="GET">
+                    <input type="name" class="form-control" name="query" placeholder="Search...">
+                    <a href="javascript:;" class="btn submit md-skip">
+                        <i class="fa fa-search"></i>
                     </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url('logout') }}"><i class="si si-logout mr-5"></i> Sign Out</a>
-                </div>
-            </div>
-            
-            <button type="button" class="btn btn-circle btn-dual-secondary" data-toggle="layout" data-action="side_overlay_toggle">
-                <i class="fa fa-tasks"></i>
-            </button>
-        </div>
-    </div>
-    <!-- END Header Content -->
-
-    <!-- Header Search -->
-    <div id="page-header-search" class="overlay-header">
-        <div class="content-header content-header-fullrow">
-            <form action="be_pages_generic_search.html" method="post">
-                <div class="input-group">
-                    <span class="input-group-btn">
-                        <button type="button" class="btn btn-secondary" data-toggle="layout" data-action="header_search_off">
-                            <i class="fa fa-times"></i>
+                </form>
+                <!-- END SEARCH -->
+                <!-- BEGIN TOPBAR ACTIONS -->
+                <div class="topbar-actions">
+                    <!-- BEGIN GROUP NOTIFICATION -->
+                    <div class="btn-group-notification btn-group" id="header_notification_bar">
+                        <button type="button" class="btn btn-sm md-skip dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <i class="icon-bell"></i>
+                            <span class="badge">7</span>
                         </button>
-                    </span>
-                    <input type="text" class="form-control" placeholder="Search or hit ESC.." id="page-header-search-input" name="page-header-search-input">
-                    <span class="input-group-btn">
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </span>
+                        <ul class="dropdown-menu-v2">
+                            <li class="external">
+                                <h3><span class="bold">12 pending</span> notifications</h3>
+                                <a href="#">view all</a>
+                            </li>
+                            <li>
+                                <ul class="dropdown-menu-list scroller" style="height: 250px; padding: 0;" data-handle-color="#637283">
+                                    <li>
+                                        <a href="javascript:;">
+                                            <span class="details">
+                                                <span class="label label-sm label-icon label-success md-skip">
+                                                    <i class="fa fa-plus"></i>
+                                                </span> New user registered. </span>
+                                            <span class="time">just now</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- END GROUP NOTIFICATION -->
+                    <!-- BEGIN USER PROFILE -->
+                    <div class="btn-group-img btn-group">
+                        <button type="button" class="btn btn-sm md-skip dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                            <span>Hi, {{\Auth::user()->surname}} {{\Auth::user()->other_names}}</span>
+                            <img src="../assets/layouts/layout5/img/avatar1.jpg" alt=""> </button>
+                        <ul class="dropdown-menu-v2" role="menu">
+                            <li>
+                                <a href="page_user_profile_1.html">
+                                    <i class="icon-user"></i> My Profile
+                                    <span class="badge badge-danger">1</span>
+                                </a>
+                            </li>
+                            <li><a href="{{ url('logout') }}"><i class="icon-key"></i> Log Out </a></li>
+                        </ul>
+                    </div>
+                    <!-- END USER PROFILE -->
+                    <!-- BEGIN QUICK SIDEBAR TOGGLER -->
+                    <button type="button" class="quick-sidebar-toggler md-skip" data-toggle="collapse">
+                        <span class="sr-only">Toggle Quick Sidebar</span>
+                        <i class="icon-logout"></i>
+                    </button>
+                    <!-- END QUICK SIDEBAR TOGGLER -->
                 </div>
-            </form>
-        </div>
-    </div>
-               
-    <!-- Please check out the Activity page under Elements category to see examples of showing/hiding it -->
-    <div id="page-header-loader" class="overlay-header bg-primary">
-        <div class="content-header content-header-fullrow text-center">
-            <div class="content-header-item">
-                <i class="fa fa-sun-o fa-spin text-white"></i>
+                <!-- END TOPBAR ACTIONS -->
             </div>
+            <!-- BEGIN HEADER MENU -->
+            <div class="nav-collapse collapse navbar-collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown dropdown-fw dropdown-fw-disabled  active open selected">
+                        <a href="{{URL::route('Dashboard')}}" class="text-uppercase"><i class="icon-home"></i> Dashboard </a>
+                        <ul class="dropdown-menu dropdown-menu-fw">
+                            <li class="active"><a href="{{URL::route('Dashboard')}}"><i class="icon-bar-chart"></i> DASHBOARD </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-bulb"></i> ELECTIONS </a></li>
+                            <li><a href="#"><i class="icon-puzzle"></i> REPORTS </a></li>
+                            <li><a href="{{URL::route('State.View')}}" class="text-uppercase"><i class="icon-briefcase"></i> STATES </a></li>
+                            <li><a href="{{URL::route('PP.View')}}" class="text-uppercase"><i class="icon-layers"></i> POLITICAL PARTIES </a></li>
+                            <li><a href="{{URL::route('PP.View')}}" class="text-uppercase"><i class="icon-settings"></i> SETTINGS </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- END HEADER MENU -->
         </div>
-    </div><!-- END Header Loader -->
-</header><!-- END Header -->
+        <!--/container-->
+    </nav>
+</header>
+<!-- END HEADER -->

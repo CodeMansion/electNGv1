@@ -1,0 +1,57 @@
+.body{
+    background-image: url('../img/22.jpg');
+    overflow-y: auto;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100%;
+    height: 100vh;
+    background-color:rgb(255, 250, 250);
+}
+
+.btn-sq-sm {
+    width: 80px !important;
+    height: 80px !important;
+    font-size: 10px;
+}
+
+.card {
+    opacity: 0.9;
+    padding: 30px;
+}
+
+.content {
+    padding: 30px;
+}
+
+
+.success-well-login {
+	padding: 10px;
+	border-left:4px solid green;
+	background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.danger-well-login {
+	padding: 10px;
+	border-left:4px solid red;
+	background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.warning-well-login {
+    padding: 10px;
+	border-left: 4px solid #F1C40F;
+	background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.info-well-login {
+	padding: 10px;
+	border-left:4px solid rgb(0, 195, 255);
+    background-color: white;
+    margin-bottom:10px;
+    font-size:13px;
+}

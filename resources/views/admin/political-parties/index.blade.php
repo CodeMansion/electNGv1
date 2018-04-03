@@ -1,106 +1,138 @@
 @extends('partials.app')
 @section('extra_style')
-    <!--customize styling for student resource-->
-    <link rel="stylesheet" href="{{ asset('js/plugins/datatables/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('js/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css') }}">
+    <link href="{{ asset('assets/global/plugins/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/global/css/components.min.css') }}" rel="stylesheet" id="style_components" type="text/css" />
 @endsection
 @section('content')
-    <main id="main-container">
-        <!-- Page Content -->
-        <div class="content container">
-            <div class="row">
-                <div class="block block-content title-hold">
-                    <div class="col-12">
-                        <h3 style="margin-bottom:5px;"><i class="si si-grid"></i> Political Parties</h3><br/>
-                        <p><a href="{{URL::route('Dashboard')}}"><i class="si si-arrow-left"></i> Return To Dashboard</a></p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="block block-content title-hold">
-                <div class="row">
-                    <div class="col-md-5">
-                        <h5>Add New Political Party</h5>
-                        <div class="form-group">
-                            <label>Code <span class="required">*</span></label>
-                            <input class='form-control' name="code" type="text" required>
-                            <span style="font-size:13px;"><em>The <b>code</b> is what is mostly used.</em></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Name <span class="required">*</span></label>
-                            <input class='form-control' name="name" type="text" required>
-                            <span style="font-size:13px;"><em>The <b>name</b> is the full meaning of the code.</em></span>
-                        </div>
-                        <div class="form-group">
-                            <label>Description <span class="required"></span></label>
-                            <textarea class='form-control' name="description" rows="6" required></textarea>
-                            <span style="font-size:13px;"><em>The <b>description</b> is just a brief explanation of the political party.</em></span>
-                        </div>
-                        <div class="form-group">
-                            <div style="padding: 5px;">
-                                <label class="control-label">Logo <span class="required"> * </span></label><br/>
-                                <div id="image_preview_logo" style="height:100px;width:100px;-webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);background-position:center center;background-size:cover;display:inline-block;"></div><br/>
-                                <input type="file" name="logo" id="uploadLogo"/>
-                            </div>
-                            <div id="errorMessage_logo"></div>
-                        </div>
-                        <div class="form-group">
-                            <button type="button" id="submit" class="create-hover btn btn-sm btn-primary">Add New Political Party</button>
-                        </div>
-                    </div>
-                    <div class="col-md-7">
-                        <h5>List of Political Party</h5>
-                        @if(count($politicalParties) < 1)
-                        <div class="danger-well">
-                            <em>There are no politial parties on this system. Use the button above to add a political party.</em>
-                        </div>
-                        @else
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th width="50"></th>
-                                    <th>CODE</th>
-                                    <th>NAME</th>
-                                    <th>DESCRIPTION</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php($index=0)
-                                @foreach($politicalParties as $party)
-                                    <tr class="state_{{$index}}">
-                                        <td></td>
-                                        <td>
-                                            <a href="{{URL::route('PP.Edit',$party['slug'])}}">{{$party['code']}}</a>
-                                        </td>
-                                        <td>
-                                            {{$party['name']}}<br/>
-                                            <span id="user-view{{$index}}" style="display:none;color:grey;" style="font-size: 12px;">
-                                                <a href="#"><i class="fa fa-edit"></i> Edit</a> | 
-                                                <a href="#"><i class="fa fa-trash-o"></i> Delete</a>
-                                            </span>
-                                        </td>
-                                        <td>{{$party['description']}}</td>
-                                    </tr>
-                                @php($index++)
-                                @endforeach
-                            </tbody>
-                        </table>
+<div class="breadcrumbs">
+        <h1>Political Parties</h1>
+        <ol class="breadcrumb">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li class="active">Political Parties</li>
+        </ol>
+    </div>
+    <!-- BEGIN SIDEBAR CONTENT LAYOUT -->
+    <div class="page-content-container">
+        <div class="page-content-row">
+            <!-- BEGIN PAGE SIDEBAR -->
+            <div class="page-sidebar">
+                <nav class="navbar" role="navigation">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <ul class="nav navbar-nav margin-bottom-35">
+                        @if(\Auth::user()->isAn('admin'))
+                            <li><a href="{{ URL::route('Dashboard') }}"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                            <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> Manage Users </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Stations</a></li>
+                            <li class="active"><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                            <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                            <li><a href="{{URL::route('preference.index')}}"><i class="icon-bell"></i> System Settings </a></li>
                         @endif
+                        @if(\Auth::user()->isAn('moderator'))
+                            <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                            <li><a href="{{URL::route('Users.View')}}"><i class="icon-user"></i> Manage Users </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Stations</a></li>
+                            <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                            <li><a href="{{URL::route('preference.uploadView')}}"><i class="icon-cloud-upload"></i> Bulk Upload </a></li>
+                        @endif
+                        @if(\Auth::user()->isAn('agent'))
+                            <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="#"><i class="icon-directions"></i> My Profile</a></li>
+                            <li><a href="#"><i class="icon-directions"></i> Change Password</a></li>
+                        @endif
+                        @if(\Auth::user()->isAn('contestant'))
+                        <li class="active"><a href="index.html"><i class="icon-home"></i> Home </a></li>
+                            <li><a href="#"><i class="icon-note "></i> Reports </a></li>
+                            <li><a href="{{URL::route('Election.View')}}"><i class="icon-trophy "></i> Elections </a></li>
+                            <li><a href="{{URL::route('ward.index')}}"><i class="icon-directions"></i> Polling Stations</a></li>
+                            <li><a href="{{URL::route('PP.View')}}"><i class="icon-users"></i> Political Parties </a></li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+            <!-- END PAGE SIDEBAR -->
+            <div class="page-content-col">
+                @include('partials.notifications')
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <!-- BEGIN Portlet PORTLET-->
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption font-green-sharp">
+                                    <i class="icon-speech font-green-sharp"></i>
+                                    <span class="caption-subject bold uppercase">Political Parties</span>
+                                    <span class="caption-helper">Showing the list if political parties...</span>
+                                </div>
+                                <div class="actions">
+                                    <a href="javascript:;" data-toggle="modal" data-target="#new-election" class="btn btn-circle btn-default btn-sm"><i class="fa fa-plus"></i> Add New Party</a>
+                                    <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;"> </a>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                @if(count($politicalParties) < 1)
+                                    <div class="danger-well">
+                                        <em>No political party found</em>
+                                    </div>
+                                @else
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <table class="table table-striped table-hover" id="sample_2">
+                                                <thead>
+                                                    <tr>
+                                                        <th>S/N</th>
+                                                        <td>LOGO</td>
+                                                        <td>CODE</td>
+                                                        <th>NAME</th>
+                                                        <th>DESCRIPTION</th>
+                                                        <th>ACTIONS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php($index=0)
+                                                    @foreach($politicalParties as $party)
+                                                        <tr>
+                                                            <td></td>
+                                                            <td><img src=<?php echo asset("uploads/party-logo/$party->code.jpg"); ?> width="50px" height="50px" alt=""></td>
+                                                            <td><a href="{{URL::route('PP.Edit',$party['slug'])}}">{{$party['code']}}</a></td>
+                                                            <td>{{$party['name']}}</td>
+                                                            <td>{{$party['description']}}</td>
+                                                            <td>
+                                                                <div class="btn-group">
+                                                                    <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="button" data-toggle="dropdown" aria-expanded="false"> Actions<i class="fa fa-angle-down"></i></button>
+                                                                    <ul class="dropdown-menu pull-left" role="menu">
+                                                                        <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-note"></i> Edit </a></li>
+                                                                        <li><a href="{{URL::route('Election.ViewOne')}}"><i class="icon-trash"></i> Delete </a></li>
+                                                                    </ul>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @php($index++)
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 @endsection
 @section('extra_script')
-    <script src="{{ asset('js/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('js/pages/be_tables_datatables.js') }}"></script>
-    <script src="{{ asset('js/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
-    <script src="{{ asset('js/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js') }}"></script>
+    <script src="{{ asset('assets/global/scripts/datatable.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/datatables/datatables.min.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js') }}" type="text/javascript"></script>
 
-    <script src="{{ asset('js/pages/be_forms_plugins.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $('table.table-striped tbody tr').each(function(index) {
@@ -177,4 +209,7 @@
             });
         });    
     </script>
+@endsection
+@section('after_script')
+    <script src="{{ asset('assets/pages/scripts/table-datatables-managed.min.js') }}" type="text/javascript"></script>
 @endsection
